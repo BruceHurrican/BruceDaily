@@ -1,2 +1,2 @@
-# BruceDayily
-used for bruce recording dayily tips
+# BruceDaily
+used for bruce recording daily tips

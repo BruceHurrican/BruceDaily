@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.brucedaily.MainActivity">
+
+    <EditText
+        android:id="@+id/et_item"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/radio_group"
+        android:gravity="top|start"
+        android:hint="请输入内容"
+        android:maxLength="200"
+        tools:ignore="HardcodedText"/>
+
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_item"
+        android:layout_margin="5dp"
+        android:background="@drawable/bgbtn"
+        android:text="增加"
+        tools:ignore="HardcodedText"/>
+
+    <Button
+        android:id="@+id/btn_modify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_item"
+        android:layout_margin="5dp"
+        android:layout_toRightOf="@id/btn_add"
+        android:background="@drawable/bgbtn"
+        android:text="修改"
+        tools:ignore="HardcodedText"/>
+
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_item"
+        android:layout_margin="5dp"
+        android:layout_toLeftOf="@+id/radio_group"
+        android:layout_toRightOf="@id/btn_modify"
+        android:background="@drawable/bgbtn"
+        android:text="删除"
+        tools:ignore="HardcodedText"/>
+
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <RadioButton
+            android:id="@+id/rbtn_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="周一"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周二"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周三"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周四"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周五"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周六"/>
+
+        <RadioButton
+            android:id="@+id/rbtn_7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="周日"/>
+    </RadioGroup>
+
+    <ListView
+        android:id="@+id/lv_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/radio_group"/>
+</RelativeLayout>
