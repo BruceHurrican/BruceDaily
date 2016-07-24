@@ -24,33 +24,30 @@
   ~    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
   -->
 
-<manifest
-    package="com.brucedaily"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application
-        android:name=".DailyApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_app"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".month.MonthDailyActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
-    </application>
-
-</manifest>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <!-- 设置填充颜色 -->
+            <solid android:color="#A5D8F5"/>
+            <corners android:radius="10dp"/>
+            <!-- 设置 Button 里面的文字与 Button边界的间隔 -->
+            <padding
+                android:bottom="5dp"
+                android:left="5dp"
+                android:right="5dp"
+                android:top="5dp"/>
+        </shape>
+    </item>
+    <item android:state_pressed="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/monthCount"/>
+            <corners android:radius="10dp"/>
+            <!-- 设置 Button 里面的文字与 Button边界的间隔 -->
+            <padding
+                android:bottom="5dp"
+                android:left="5dp"
+                android:right="5dp"
+                android:top="5dp"/>
+        </shape>
+    </item>
+</selector>

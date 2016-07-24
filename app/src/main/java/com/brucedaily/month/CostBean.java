@@ -23,32 +23,21 @@
  *    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
-apply plugin: 'com.android.application'
+package com.brucedaily.month;
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+/**
+ * Created by BruceHurrican on 2016/7/24.
+ */
+public class CostBean {
+    public int date;
+    public String title;
+    public String detail;
+    public float price;
 
-    defaultConfig {
-        applicationId "com.brucedaily"
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+    public CostBean(int date, String title, String detail, float price) {
+        this.date = date;
+        this.title = title;
+        this.detail = detail;
+        this.price = price;
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile project(':bruceutils')
-    compile 'org.greenrobot:greendao:3.0.1'
-    compile 'com.android.support:recyclerview-v7:24.1.1'
-    compile 'com.android.support:cardview-v7:24.1.1'
 }
