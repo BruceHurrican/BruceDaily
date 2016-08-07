@@ -25,6 +25,7 @@
 
 package com.brucedaily.month;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,8 +43,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.brucedaily.R;
+import com.brucedaily.database.bean.CostMonth;
+import com.brucedaily.database.dao.CostMonthDao;
+import com.brucedaily.database.dao.DaoMaster;
+import com.brucedaily.database.dao.DaoSession;
 import com.bruceutils.base.BaseActivity;
 import com.bruceutils.utils.logdetails.LogDetails;
+
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -305,7 +312,8 @@ public class MonthDailyActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
-                showAddModifyPop(-1, true);
+//                showAddModifyPop(-1, true);
+                accessGreenDao();
                 break;
             case R.id.btn_clear:
                 dataList.clear();
@@ -321,6 +329,30 @@ public class MonthDailyActivity extends BaseActivity {
                 rvContainer.setLayoutManager(staggeredGridLayoutManager);
                 break;
         }
+    }
+
+    // TODO: 2016/8/7 入口需要调整
+    private void accessGreenDao() {
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "md_db", null);
+        SQLiteDatabase writableDatabase = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(writableDatabase);
+        DaoSession daoSession = daoMaster.newSession();
+        CostMonthDao costMonthDao = daoSession.getCostMonthDao();
+        CostMonth costMonth = new CostMonth();
+        costMonth.setCostDay(23);
+//                costMonth.setId(10);
+        costMonth.setCostTitle("aatitle");
+        costMonth.setCostDetail("aadetail");
+        costMonth.setCostPrice("88.26");
+//        costMonth = new CostMonth(0,23,"aatitle","aadetail","88.32");
+        costMonthDao.insertOrReplace(costMonth);
+        QueryBuilder.LOG_SQL = true;
+        QueryBuilder.LOG_VALUES = true;
+        LogDetails.i(costMonthDao.count() + "\n" + costMonthDao.queryBuilder().list() + "\n" + costMonthDao.getKey(costMonth) + "\n" + costMonthDao.getPkProperty().columnName);
+        LogDetails.i(costMonthDao.queryBuilder().where(CostMonthDao.Properties.CostDay.eq(23)).orderAsc(CostMonthDao.Properties.Id).list());
+        daoSession = null;
+        helper.close();
+        helper = null;
     }
 
     @Override
