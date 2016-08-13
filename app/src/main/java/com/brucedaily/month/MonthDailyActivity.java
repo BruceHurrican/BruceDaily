@@ -206,7 +206,7 @@ public class MonthDailyActivity extends BaseActivity {
         TextView tvDetail = (TextView) view.findViewById(R.id.tv_detail);
         tvTitle.setText(dataList.get(position).costTitle);
         tvDetail.setText(dataList.get(position).costDetail);
-        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setBackgroundDrawable(new BitmapDrawable()); // 点击可以消失
         popupWindow.setTouchable(true);
         popupWindow.setFocusable(true);
@@ -221,19 +221,24 @@ public class MonthDailyActivity extends BaseActivity {
     private void showOperator(final int position) {
         LogDetails.i("position-" + position);
         View view = getLayoutInflater().inflate(R.layout.month_item_detail, null);
-        TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
-        TextView tvDetail = (TextView) view.findViewById(R.id.tv_detail);
-        tvTitle.setText("修改");
-        tvDetail.setText("删除");
-        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        tvTitle.setOnClickListener(new View.OnClickListener() {
+        TextView tvModify = (TextView) view.findViewById(R.id.tv_title);
+        TextView tvDelete = (TextView) view.findViewById(R.id.tv_detail);
+        tvModify.setText("修改");
+        tvDelete.setText("删除");
+        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable()); // 点击可以消失
+        popupWindow.setTouchable(true);
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
+        tvModify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                modify(position);
+                operateCostRecord(position, false);
             }
         });
-        tvDetail.setOnClickListener(new View.OnClickListener() {
+        tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 先删除数据库中数据再删除内存中数据
@@ -245,11 +250,6 @@ public class MonthDailyActivity extends BaseActivity {
                 showToastShort("删除一条数据");
             }
         });
-        popupWindow.setBackgroundDrawable(new BitmapDrawable()); // 点击可以消失
-        popupWindow.setTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
     }
 
     /**
@@ -260,8 +260,13 @@ public class MonthDailyActivity extends BaseActivity {
         monthCount();
     }
 
-    // 修改
-    private void modify(final int position) {
+    /**
+     * 操作消费记录,当前只支持 “增加” 和 “删除” 操作
+     *
+     * @param position
+     * @param isAdd
+     */
+    private void operateCostRecord(final int position, final boolean isAdd) {
         LogDetails.i("position-%s", position);
         View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
         final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
@@ -271,10 +276,12 @@ public class MonthDailyActivity extends BaseActivity {
         Button btnOk = (Button) view.findViewById(R.id.btn_ok);
         Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
 
-        etTitle.setHint(dataList.get(position).costTitle);
-        etContent.setHint(dataList.get(position).costDetail);
-        etTime.setHint(dataList.get(position).costDay + "");
-        etPrice.setHint(dataList.get(position).costPrice);
+        if (!isAdd) {
+            etTitle.setHint(dataList.get(position).costTitle);
+            etContent.setHint(dataList.get(position).costDetail);
+            etTime.setHint(dataList.get(position).costDay + "");
+            etPrice.setHint(dataList.get(position).costPrice);
+        }
 
         final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setTouchable(true);
@@ -289,75 +296,19 @@ public class MonthDailyActivity extends BaseActivity {
                 String content = etContent.getEditableText().toString().trim();
                 String tmpTime = etTime.getEditableText().toString().trim();
                 String price = etPrice.getEditableText().toString().trim();
-                CostMonth costMonth = dataList.get(position);
-                if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
-                    LogDetails.w("数据未做任何修改");
-                    showToastShort("亲,未修改任何信息喔~");
-                    return;
-                }
-                int time = 0;
-                if (!TextUtils.isEmpty(title)) {
-                    costMonth.costTitle = title;
-                }
-                if (!TextUtils.isEmpty(content)) {
-                    costMonth.costDetail = content;
-                }
-                if (!TextUtils.isEmpty(tmpTime)) {
-                    time = Integer.valueOf(tmpTime);
-                } else {
-                    time = costMonth.costDay;
-                }
-                if (!TextUtils.isEmpty(price)) {
-                    costMonth.costPrice = price;
-                }
-                if (time >= 32) {
-                    LogDetails.w("输入非法数据");
-                    showToastShort("日期不能大于31的数字");
-                    return;
-                }
-
-                LogDetails.i("time-%s", time);
-                if (time == dataList.get(position).costDay) {
-                    dataList.set(position, costMonth);
-                    updateItem(costMonth);
-                } else {
-                    costMonth.costDay = time;
-                    dataList.remove(position);
-                    CostMonth tmpCostMonth = costMonth;
-                    int index = -1;
-                    for (int i = 0; i < dataList.size(); i++) {
-                        if (time == dataList.get(i).costDay) {
-                            index = i;
-                            break;
-                        }
+                if (isAdd) {
+                    if (!addCostRecord(title, content, tmpTime, price)) {
+                        LogDetails.i("增加记录失败");
+                        return;
                     }
-                    LogDetails.i("index-" + index);
-                    tmpCostMonth.costDay = time;
-                    LogDetails.i("tmpCostMonth - %s", tmpCostMonth);
-                    if (index != -1) {
-                        dataList.add(index, tmpCostMonth);
-                    } else {
-                        if (dataList.size() == 0) {
-                            dataList.add(tmpCostMonth);
-                        } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
-                            dataList.add(tmpCostMonth);
-                        } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
-                            for (int i = 0; i < dataList.size(); i++) {
-                                if (time < dataList.get(i).costDay) {
-                                    index = i; // 获取相同日期的索引
-                                    break;
-                                }
-                            }
-                            // 将数据插入到相同日期的最前端
-                            dataList.add(index, tmpCostMonth);
-                        }
+                } else {
+                    if (!modifyCostRecord(position, title, content, tmpTime, price)) {
+                        LogDetails.i("修改消费记录失败");
+                        return;
                     }
-                    addItem(tmpCostMonth);
                 }
                 refreshData();
                 popupWindow.dismiss();
-                LogDetails.i("修改成功");
-                showToastShort("修改成功");
             }
         });
 
@@ -369,106 +320,163 @@ public class MonthDailyActivity extends BaseActivity {
         });
     }
 
-    //增加数据
-    private void addData() {
-        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
-        final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
-        final EditText etContent = (EditText) view.findViewById(R.id.et_content);
-        final EditText etTime = (EditText) view.findViewById(R.id.et_time);
-        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
-        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
-        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+    /**
+     * 修改消费记录
+     *
+     * @param position 修改消费项索引
+     * @param title    消费标题{@link CostMonth#costTitle}
+     * @param content  消费详情{@link CostMonth#costDetail}
+     * @param tmpTime  消费时间{@link CostMonth#costDay}
+     * @param price    消费金额{@link CostMonth#costPrice}
+     * @return true 修改记录成功
+     */
+    private boolean modifyCostRecord(int position, String title, String content, String tmpTime, String price) {
+        CostMonth costMonth = dataList.get(position);
+        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+            LogDetails.w("数据未做任何修改");
+            showToastShort("亲,未修改任何信息喔~");
+            return false;
+        }
+        int time = 0;
+        if (!TextUtils.isEmpty(title)) {
+            costMonth.costTitle = title;
+        }
+        if (!TextUtils.isEmpty(content)) {
+            costMonth.costDetail = content;
+        }
+        if (!TextUtils.isEmpty(tmpTime)) {
+            time = Integer.valueOf(tmpTime);
+        } else {
+            time = costMonth.costDay;
+        }
+        if (!TextUtils.isEmpty(price)) {
+            costMonth.costPrice = price;
+        }
+        if (time >= 32) {
+            LogDetails.w("输入非法数据");
+            showToastShort("日期不能大于31的数字");
+            return false;
+        }
 
-        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
-
-
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = etTitle.getEditableText().toString().trim();
-                String content = etContent.getEditableText().toString().trim();
-                String tmpTime = etTime.getEditableText().toString().trim();
-                String price = etPrice.getEditableText().toString().trim();
-                if (TextUtils.isEmpty(title) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
-                    LogDetails.i("必填项不能为空");
-                    showToastShort("必填项不能为空");
-                    return;
+        LogDetails.i("time-%s", time);
+        if (time == dataList.get(position).costDay) {
+            dataList.set(position, costMonth);
+            updateItem(costMonth);
+        } else {
+            costMonth.costDay = time;
+            dataList.remove(position);
+            CostMonth tmpCostMonth = costMonth;
+            int index = -1;
+            for (int i = 0; i < dataList.size(); i++) {
+                if (time == dataList.get(i).costDay) {
+                    index = i;
+                    break;
                 }
-                int time = Integer.valueOf(tmpTime);
-                LogDetails.i("time-" + time);
-                if (time >= 32) {
-                    LogDetails.w("输入非法数据");
-                    showToastShort("日期不能大于31的数字");
-                    return;
-                }
-                CostMonth costMonth = new CostMonth();
-                costMonth.costDay = time;
-                costMonth.costTitle = title;
-                costMonth.costDetail = content;
-                costMonth.costPrice = price;
-
+            }
+            LogDetails.i("index-" + index);
+            tmpCostMonth.costDay = time;
+            LogDetails.i("tmpCostMonth - %s", tmpCostMonth);
+            if (index != -1) {
+                dataList.add(index, tmpCostMonth);
+            } else {
                 if (dataList.size() == 0) {
-                    dataList.add(costMonth);
-                } else {
-                    int index = -1;
+                    dataList.add(tmpCostMonth);
+                } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
+                    dataList.add(tmpCostMonth);
+                } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
                     for (int i = 0; i < dataList.size(); i++) {
-                        if (time == dataList.get(i).costDay) {
+                        if (time < dataList.get(i).costDay) {
                             index = i; // 获取相同日期的索引
                             break;
                         }
                     }
-                    LogDetails.i("index-" + index);
-                    if (index != -1) {
-                        // 将数据插入到相同日期的最前端
-                        dataList.add(index, costMonth);
-                    } else {
-                        if (time > dataList.get(dataList.size() - 1).costDay) {
-                            // 新增日期大于表中日期
-                            dataList.add(costMonth);
-                        } else if (time < dataList.get(dataList.size() - 1).costDay) {
-                            // 新增日期小于表中日期
-                            for (int i = 0; i < dataList.size(); i++) {
-                                if (time < dataList.get(i).costDay) {
-                                    index = i; // 获取表中最小日期索引
-                                    break;
-                                }
-                            }
-                            // 将数据插入到相同日期的最前端
-                            dataList.add(index, costMonth);
+                    // 将数据插入到相同日期的最前端
+                    dataList.add(index, tmpCostMonth);
+                }
+            }
+            addItem(tmpCostMonth);
+        }
+        LogDetails.i("修改成功");
+        showToastShort("修改成功");
+        return true;
+    }
+
+    /**
+     * 增加消费记录
+     *
+     * @param title   消费标题{@link CostMonth#costTitle}
+     * @param content 消费详情{@link CostMonth#costDetail}
+     * @param tmpTime 消费时间{@link CostMonth#costDay}
+     * @param price   消费金额{@link CostMonth#costPrice}
+     * @return true 增加记录成功
+     */
+    private boolean addCostRecord(String title, String content, String tmpTime, String price) {
+        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+            LogDetails.i("必填项不能为空");
+            showToastShort("必填项不能为空");
+            return false;
+        }
+        int time = Integer.valueOf(tmpTime);
+        LogDetails.i("time-" + time);
+        if (time >= 32) {
+            LogDetails.w("输入非法数据");
+            showToastShort("日期不能大于31的数字");
+            return false;
+        }
+        CostMonth costMonth = new CostMonth();
+        costMonth.costDay = time;
+        costMonth.costTitle = title;
+        costMonth.costDetail = content;
+        costMonth.costPrice = price;
+
+        if (dataList.size() == 0) {
+            dataList.add(costMonth);
+        } else {
+            int index = -1;
+            for (int i = 0; i < dataList.size(); i++) {
+                if (time == dataList.get(i).costDay) {
+                    index = i; // 获取相同日期的索引
+                    break;
+                }
+            }
+            LogDetails.i("index-" + index);
+            if (index != -1) {
+                // 将数据插入到相同日期的最前端
+                dataList.add(index, costMonth);
+            } else {
+                if (time > dataList.get(dataList.size() - 1).costDay) {
+                    // 新增日期大于表中日期
+                    dataList.add(costMonth);
+                } else if (time < dataList.get(dataList.size() - 1).costDay) {
+                    // 新增日期小于表中日期
+                    for (int i = 0; i < dataList.size(); i++) {
+                        if (time < dataList.get(i).costDay) {
+                            index = i; // 获取表中最小日期索引
+                            break;
                         }
                     }
+                    // 将数据插入到相同日期的最前端
+                    dataList.add(index, costMonth);
                 }
-                addItem(costMonth);
-                refreshData();
-                popupWindow.dismiss();
-                LogDetails.i("增加数据成功");
-                showToastShort("增加数据成功");
             }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-            }
-        });
+        }
+        addItem(costMonth);
+        LogDetails.i("增加数据成功");
+        showToastShort("增加数据成功");
+        return true;
     }
 
     @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
-                addData();
+                operateCostRecord(-1, true);
                 break;
             case R.id.btn_clear:
                 dataList.clear();
                 LogDetails.i("size-" + dataList.size());
-                refreshData();
                 deleteAllData();
+                refreshData();
                 break;
             case R.id.btn_list:
                 LinearLayoutManager manager = new LinearLayoutManager(MonthDailyActivity.this, LinearLayoutManager.VERTICAL, false);
