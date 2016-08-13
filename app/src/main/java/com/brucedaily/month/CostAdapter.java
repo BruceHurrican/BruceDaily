@@ -48,10 +48,6 @@ public class CostAdapter extends RecyclerView.Adapter<CostAdapter.CostViewHolder
     private CardViewItemLongClickListener itemLongClickListener;
 
     public CostAdapter(List<CostMonth> dataList) {
-//        if (null == dataList || dataList.size() == 0) {
-//            LogDetails.d("输入数据不能空");
-//            return;
-//        }
         LogDetails.i("dataList->" + dataList);
         this.dataList = dataList;
     }

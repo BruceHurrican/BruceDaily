@@ -88,7 +88,7 @@
             android:id="@+id/tv_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="月预算总额:"
+            android:text="月预算总额:4500"
             android:textColor="#af00"
             android:textSize="16sp"
             tools:ignore="HardcodedText"/>
@@ -103,7 +103,7 @@
             tools:ignore="HardcodedText"/>
 
         <TextView
-            android:id="@+id/tv_count1"
+            android:id="@+id/tv_count_early"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="上旬消费统计:"
@@ -112,7 +112,7 @@
             tools:ignore="HardcodedText"/>
 
         <TextView
-            android:id="@+id/tv_count2"
+            android:id="@+id/tv_count_middle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="中旬消费统计:"
@@ -121,7 +121,7 @@
             tools:ignore="HardcodedText"/>
 
         <TextView
-            android:id="@+id/tv_count3"
+            android:id="@+id/tv_count_last"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="下旬消费统计:"
