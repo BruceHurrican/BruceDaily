@@ -168,7 +168,7 @@ public class MonthDailyActivity extends BaseActivity {
             monthEarly += Float.valueOf(tmpList.get(i).costPrice);
         }
         LogDetails.i("当月上旬花费共计 %f 元", monthEarly);
-        tvCountEarly.setText("上旬消费统计:" + monthEarly);
+        tvCountEarly.setText("上旬消费统计: " + monthEarly);
 
         // 中旬花费
         float monthMiddle = 0;
@@ -178,7 +178,7 @@ public class MonthDailyActivity extends BaseActivity {
             monthMiddle += Float.valueOf(tmpList.get(i).costPrice);
         }
         LogDetails.i("当月中旬花费共计 %f 元", monthMiddle);
-        tvCountMiddle.setText("中旬消费统计:" + monthMiddle);
+        tvCountMiddle.setText("中旬消费统计: " + monthMiddle);
 
         // 下旬花费
         float monthLast = 0;
@@ -188,10 +188,10 @@ public class MonthDailyActivity extends BaseActivity {
             monthLast += Float.valueOf(tmpList.get(i).costPrice);
         }
         LogDetails.i("当月下旬花费共计 %f 元", monthLast);
-        tvCountLast.setText("下旬消费统计:" + monthLast);
+        tvCountLast.setText("下旬消费统计: " + monthLast);
 
         float monthRemain = total - monthEarly - monthMiddle - monthLast;
-        tvRemain.setText("月预算余额:" + monthRemain);
+        tvRemain.setText("月预算余额: " + monthRemain);
 
     }
 
