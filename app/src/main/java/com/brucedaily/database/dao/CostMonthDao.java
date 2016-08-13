@@ -79,36 +79,36 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
     protected final void bindValues(DatabaseStatement stmt, CostMonth entity) {
         stmt.clearBindings();
 
-        Long id = entity.getId();
+        Long id = entity.id;
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getCostDay());
-        stmt.bindString(3, entity.getCostTitle());
+        stmt.bindLong(2, entity.costDay);
+        stmt.bindString(3, entity.costTitle);
 
-        String costDetail = entity.getCostDetail();
+        String costDetail = entity.costDetail;
         if (costDetail != null) {
             stmt.bindString(4, costDetail);
         }
-        stmt.bindString(5, entity.getCostPrice());
+        stmt.bindString(5, entity.costPrice);
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, CostMonth entity) {
         stmt.clearBindings();
 
-        Long id = entity.getId();
+        Long id = entity.id;
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindLong(2, entity.getCostDay());
-        stmt.bindString(3, entity.getCostTitle());
+        stmt.bindLong(2, entity.costDay);
+        stmt.bindString(3, entity.costTitle);
 
-        String costDetail = entity.getCostDetail();
+        String costDetail = entity.costDetail;
         if (costDetail != null) {
             stmt.bindString(4, costDetail);
         }
-        stmt.bindString(5, entity.getCostPrice());
+        stmt.bindString(5, entity.costPrice);
     }
 
     @Override
@@ -130,23 +130,23 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
 
     @Override
     public void readEntity(Cursor cursor, CostMonth entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setCostDay(cursor.getInt(offset + 1));
-        entity.setCostTitle(cursor.getString(offset + 2));
-        entity.setCostDetail(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setCostPrice(cursor.getString(offset + 4));
+        entity.id = cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
+        entity.costDay = cursor.getInt(offset + 1);
+        entity.costTitle = cursor.getString(offset + 2);
+        entity.costDetail = cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3);
+        entity.costPrice = cursor.getString(offset + 4);
     }
 
     @Override
     protected final Long updateKeyAfterInsert(CostMonth entity, long rowId) {
-        entity.setId(rowId);
+        entity.id = rowId;
         return rowId;
     }
 
     @Override
     public Long getKey(CostMonth entity) {
         if (entity != null) {
-            return entity.getId();
+            return entity.id;
         } else {
             return null;
         }

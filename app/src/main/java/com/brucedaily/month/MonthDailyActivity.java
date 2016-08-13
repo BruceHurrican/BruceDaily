@@ -93,15 +93,21 @@ public class MonthDailyActivity extends BaseActivity {
     @Bind(R.id.rl_root)
     RelativeLayout rlRoot;
 
-    private List<CostBean> dataList = new ArrayList<>(31);
+    private List<CostMonth> dataList = new ArrayList<>(31);
     private CostAdapter costAdapter;
+    // 数据库相关
+    private DaoMaster.DevOpenHelper devOpenHelper;
+    private SQLiteDatabase writableDatabase;
+    private CostMonthDao costMonthDao;
+    private DaoSession daoSession;
+    private DaoMaster daoMaster;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.month_activity_daily);
         ButterKnife.bind(this);
-
+        initDatabase();
         // TODO: 2016/7/25 从数据库中获取数据
         initData();
 
@@ -117,22 +123,25 @@ public class MonthDailyActivity extends BaseActivity {
         costAdapter.setItemClickListener(new CostAdapter.CardViewItemClickListener() {
             @Override
             public void itemClick(View view, int position) {
-                LogDetails.i("当前选中的数据: " + dataList.get(position).title);
+                LogDetails.i("当前选中的数据: " + dataList.get(position).costTitle);
                 showDetails(position);
             }
         });
         costAdapter.setItemLongClickListener(new CostAdapter.CardViewItemLongClickListener() {
             @Override
             public void itemLongClick(View view, int position) {
-                LogDetails.i("当前选中的数据: " + dataList.get(position).price);
+                LogDetails.i("当前选中的数据: " + dataList.get(position).costPrice);
                 showOperator(position);
             }
         });
     }
 
     private void initData() {
-        for (int i = 0; i < 20; i++) {
-            dataList.add(new CostBean(i + 1, "中餐" + i, "中餐详情" + i, (3.66f + i)));
+        // 查询结果集按日期升序排序，如果日期相同则按id降序排序
+        dataList = costMonthDao.queryBuilder().orderAsc(CostMonthDao.Properties.CostDay).orderDesc(CostMonthDao.Properties.Id).list();
+        LogDetails.i("dataList 是否为空? " + (null == dataList));
+        if (dataList == null) {
+            dataList = new ArrayList<>(1);
         }
     }
 
@@ -140,8 +149,8 @@ public class MonthDailyActivity extends BaseActivity {
         View view = getLayoutInflater().inflate(R.layout.month_item_detail, null);
         TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
         TextView tvDetail = (TextView) view.findViewById(R.id.tv_detail);
-        tvTitle.setText(dataList.get(position).title);
-        tvDetail.setText(dataList.get(position).detail);
+        tvTitle.setText(dataList.get(position).costTitle);
+        tvDetail.setText(dataList.get(position).costDetail);
         final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setBackgroundDrawable(new BitmapDrawable()); // 点击可以消失
         popupWindow.setTouchable(true);
@@ -151,6 +160,7 @@ public class MonthDailyActivity extends BaseActivity {
     }
 
     private void showOperator(final int position) {
+        LogDetails.i("position-" + position);
         View view = getLayoutInflater().inflate(R.layout.month_item_detail, null);
         TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
         TextView tvDetail = (TextView) view.findViewById(R.id.tv_detail);
@@ -161,7 +171,8 @@ public class MonthDailyActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 popupWindow.dismiss();
-                showAddModifyPop(position, false);
+//                showAddModifyPop(position, false);
+                modify(position);
             }
         });
         tvDetail.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +181,7 @@ public class MonthDailyActivity extends BaseActivity {
                 dataList.remove(position);
                 costAdapter.notifyDataSetChanged();
                 popupWindow.dismiss();
+                deleteItem(dataList.get(position));
                 LogDetails.i("删除一条数据");
                 showToastShort("删除一条数据");
             }
@@ -181,8 +193,9 @@ public class MonthDailyActivity extends BaseActivity {
         popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
     }
 
-    private void showAddModifyPop(final int position, final boolean isAdd) {
-        LogDetails.i("position-%s,isAdd-%s", position, isAdd);
+    // 修改
+    private void modify(final int position) {
+        LogDetails.i("position-%s", position);
         View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
         final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
         final EditText etContent = (EditText) view.findViewById(R.id.et_content);
@@ -191,12 +204,10 @@ public class MonthDailyActivity extends BaseActivity {
         Button btnOk = (Button) view.findViewById(R.id.btn_ok);
         Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
 
-        if (!isAdd) {
-            etTitle.setHint(dataList.get(position).title);
-            etContent.setHint(dataList.get(position).detail);
-            etTime.setHint(dataList.get(position).date + "");
-            etPrice.setHint(dataList.get(position).price + "");
-        }
+        etTitle.setHint(dataList.get(position).costTitle);
+        etContent.setHint(dataList.get(position).costDetail);
+        etTime.setHint(dataList.get(position).costDay + "");
+        etPrice.setHint(dataList.get(position).costPrice);
 
         final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setTouchable(true);
@@ -210,10 +221,11 @@ public class MonthDailyActivity extends BaseActivity {
                 String title = etTitle.getEditableText().toString().trim();
                 String content = etContent.getEditableText().toString().trim();
                 String tmpTime = etTime.getEditableText().toString().trim();
-                String tmpPrice = etPrice.getEditableText().toString().trim();
-                if (TextUtils.isEmpty(title) || TextUtils.isEmpty(content) || TextUtils.isEmpty(tmpTime) || TextUtils.isEmpty(tmpPrice)) {
-                    LogDetails.w("输入数据不能为空");
-                    showToastShort("不能输入空数据");
+                String price = etPrice.getEditableText().toString().trim();
+                CostMonth costMonth = dataList.get(position);
+                if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+                    LogDetails.w("数据未做任何修改");
+                    showToastShort("亲,未修改任何信息喔~");
                     return;
                 }
                 int time = Integer.valueOf(tmpTime);
@@ -222,84 +234,59 @@ public class MonthDailyActivity extends BaseActivity {
                     showToastShort("日期不能大于31的数字");
                     return;
                 }
-                float price = Float.valueOf(tmpPrice);
-                CostBean costBean = null;
-                if (isAdd) {
-                    costBean = new CostBean(time, title, content, price);
-                    if (dataList.size() == 0) {
-                        dataList.add(costBean);
-                    } else {
-                        int index = -1;
-                        for (int i = 0; i < dataList.size(); i++) {
-                            if (time == dataList.get(i).date) {
-                                index = i;
-                            }
-                        }
-                        if (index != -1) {
-                            dataList.add(index, costBean);
-                        } else {
-                            if (time > dataList.get(dataList.size() - 1).date) {
-                                dataList.add(costBean);
-                            } else if (time < dataList.get(dataList.size() - 1).date) {
-                                for (int i = 0; i < dataList.size(); i++) {
-                                    if (time < dataList.get(i).date) {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                dataList.add(index, costBean);
-                            }
-                        }
-                    }
-                } else {
-                    costBean = dataList.get(position);
-                    LogDetails.i("time-%s", time);
-                    if (time == dataList.get(position).date) {
-                        costBean.title = title;
-                        costBean.detail = content;
-                        costBean.price = price;
-                        dataList.set(position, costBean);
-                    } else {
-                        dataList.remove(position);
-                        costBean = new CostBean(time, title, content, price);
-                        int index = -1;
-                        for (int i = 0; i < dataList.size(); i++) {
-                            if (time == dataList.get(i).date) {
-                                index = i;
-                            }
-                        }
-                        costBean.date = time;
-                        if (index != -1) {
-                            dataList.add(index, costBean);
-                        } else {
-                            if (dataList.size() == 0) {
-                                dataList.add(costBean);
-                            } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).date) {
-                                dataList.add(costBean);
-                            } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).date) {
-                                for (int i = 0; i < dataList.size(); i++) {
-                                    if (time < dataList.get(i).date) {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                dataList.add(index + 1, costBean);
-                            }
-                        }
-                    }
+                if (!TextUtils.isEmpty(title)) {
+                    costMonth.costTitle = title;
+                }
+                if (!TextUtils.isEmpty(content)) {
+                    costMonth.costDetail = content;
+                }
+                if (!TextUtils.isEmpty(tmpTime)) {
+                    costMonth.costDay = time;
+                }
+                if (!TextUtils.isEmpty(price)) {
+                    costMonth.costPrice = price;
                 }
 
-                popupWindow.dismiss();
-                costAdapter.notifyDataSetChanged();
-                if (isAdd) {
-                    LogDetails.i("增加成功");
-                    showToastShort("增加成功");
+                LogDetails.i("time-%s", time);
+                if (time == dataList.get(position).costDay) {
+                    dataList.set(position, costMonth);
+                    updateItem(costMonth);
                 } else {
-                    LogDetails.i("修改成功");
-                    showToastShort("修改成功");
+                    dataList.remove(position);
+                    CostMonth tmpCostMonth = costMonth;
+                    int index = -1;
+                    for (int i = 0; i < dataList.size(); i++) {
+                        if (time == dataList.get(i).costDay) {
+                            index = i;
+                        }
+                    }
+                    tmpCostMonth.costDay = time;
+                    if (index != -1) {
+                        dataList.add(index, tmpCostMonth);
+                    } else {
+                        if (dataList.size() == 0) {
+                            dataList.add(tmpCostMonth);
+                        } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
+                            dataList.add(tmpCostMonth);
+                        } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
+                            for (int i = 0; i < dataList.size(); i++) {
+                                if (time < dataList.get(i).costDay) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+                            dataList.add(index + 1, tmpCostMonth);
+                        }
+                        addItem(tmpCostMonth);
+                    }
                 }
+                costAdapter.notifyDataSetChanged();
+                popupWindow.dismiss();
+                LogDetails.i("修改成功");
+                showToastShort("修改成功");
             }
         });
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -308,17 +295,244 @@ public class MonthDailyActivity extends BaseActivity {
         });
     }
 
+    //增加数据
+    private void addData() {
+        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
+        final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
+        final EditText etContent = (EditText) view.findViewById(R.id.et_content);
+        final EditText etTime = (EditText) view.findViewById(R.id.et_time);
+        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
+        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
+        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+
+        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setTouchable(true);
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
+
+
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String title = etTitle.getEditableText().toString().trim();
+                String content = etContent.getEditableText().toString().trim();
+                String tmpTime = etTime.getEditableText().toString().trim();
+                String price = etPrice.getEditableText().toString().trim();
+                if (TextUtils.isEmpty(title) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+                    LogDetails.i("必填项不能为空");
+                    showToastShort("必填项不能为空");
+                    return;
+                }
+                int time = Integer.valueOf(tmpTime);
+                LogDetails.i("time-" + time);
+                if (time >= 32) {
+                    LogDetails.w("输入非法数据");
+                    showToastShort("日期不能大于31的数字");
+                    return;
+                }
+                CostMonth costMonth = new CostMonth();
+                costMonth.costDay = time;
+                costMonth.costTitle = title;
+                costMonth.costDetail = content;
+                costMonth.costPrice = price;
+
+                if (dataList.size() == 0) {
+                    dataList.add(costMonth);
+                } else {
+                    int index = -1;
+                    for (int i = 0; i < dataList.size(); i++) {
+                        if (time == dataList.get(i).costDay) {
+                            index = i; // 获取相同日期的索引
+                            break;
+                        }
+                    }
+                    LogDetails.i("index-" + index);
+                    if (index != -1) {
+                        // 将数据插入到相同日期的最前端
+                        dataList.add(index, costMonth);
+                    } else {
+                        if (time > dataList.get(dataList.size() - 1).costDay) {
+                            // 新增日期大于表中日期
+                            dataList.add(costMonth);
+                        } else if (time < dataList.get(dataList.size() - 1).costDay) {
+                            // 新增日期小于表中日期
+                            for (int i = 0; i < dataList.size(); i++) {
+                                if (time < dataList.get(i).costDay) {
+                                    index = i; // 获取表中最小日期索引
+                                    break;
+                                }
+                            }
+                            // 将数据插入到相同日期的最前端
+                            dataList.add(index, costMonth);
+                        }
+                    }
+                }
+                addItem(costMonth);
+                costAdapter.notifyDataSetChanged();
+                popupWindow.dismiss();
+                LogDetails.i("增加数据成功");
+                showToastShort("增加数据成功");
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    private void showAddModifyPop(final int position, final boolean isAdd) {
+//        LogDetails.i("position-%s,isAdd-%s", position, isAdd);
+//        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
+//        final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
+//        final EditText etContent = (EditText) view.findViewById(R.id.et_content);
+//        final EditText etTime = (EditText) view.findViewById(R.id.et_time);
+//        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
+//        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
+//        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+//
+//        if (!isAdd) {
+//            etTitle.setHint(dataList.get(position).costTitle);
+//            etContent.setHint(dataList.get(position).costDetail);
+//            etTime.setHint(dataList.get(position).costDay + "");
+//            etPrice.setHint(dataList.get(position).costPrice);
+//        }
+//
+//        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        popupWindow.setTouchable(true);
+//        popupWindow.setFocusable(true);
+//        popupWindow.setOutsideTouchable(true);
+//        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
+//
+//        btnOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String title = etTitle.getEditableText().toString().trim();
+//                String content = etContent.getEditableText().toString().trim();
+//                String tmpTime = etTime.getEditableText().toString().trim();
+//                String price = etPrice.getEditableText().toString().trim();
+//                if (TextUtils.isEmpty(title) || TextUtils.isEmpty(content) || TextUtils.isEmpty(tmpTime) || TextUtils.isEmpty(price)) {
+//                    LogDetails.w("输入数据不能为空");
+//                    showToastShort("不能输入空数据");
+//                    return;
+//                }
+//                int time = Integer.valueOf(tmpTime);
+//                if (time >= 32) {
+//                    LogDetails.w("输入非法数据");
+//                    showToastShort("日期不能大于31的数字");
+//                    return;
+//                }
+////                float price = Float.valueOf(tmpPrice);
+//                CostMonth costMonth = null;
+//                if (isAdd) {
+////                    costMonth = new CostMonth(time, title, content, price);
+//                    costMonth = new CostMonth();
+//                    costMonth.costDay = time;
+//                    costMonth.costTitle = title;
+//                    costMonth.costDetail = content;
+//                    costMonth.costPrice = price;
+//                    if (dataList.size() == 0) {
+//                        dataList.add(costMonth);
+//                    } else {
+//                        int index = -1;
+//                        for (int i = 0; i < dataList.size(); i++) {
+//                            if (time == dataList.get(i).costDay) {
+//                                index = i;
+//                            }
+//                        }
+//                        if (index != -1) {
+//                            dataList.add(index, costMonth);
+//                        } else {
+//                            if (time > dataList.get(dataList.size() - 1).costDay) {
+//                                dataList.add(costMonth);
+//                            } else if (time < dataList.get(dataList.size() - 1).costDay) {
+//                                for (int i = 0; i < dataList.size(); i++) {
+//                                    if (time < dataList.get(i).costDay) {
+//                                        index = i;
+//                                        break;
+//                                    }
+//                                }
+//                                dataList.add(index, costMonth);
+//                            }
+//                        }
+//                    }
+//                    addItem(costMonth);
+//                } else {
+//                    costMonth = dataList.get(position);
+//                    LogDetails.i("time-%s", time);
+//                    if (time == dataList.get(position).costDay) {
+//                        costMonth.costTitle = title;
+//                        costMonth.costDetail = content;
+//                        costMonth.costPrice = price;
+//                        dataList.set(position, costMonth);
+//                        updateItem(costMonth);
+//                    } else {
+//                        dataList.remove(position);
+////                        costMonth = new CostMonth();
+////                        costMonth.costDay = time;
+////                        costMonth.costTitle = title;
+////                        costMonth.costDetail = content;
+////                        costMonth.costPrice = price;
+//                        int index = -1;
+//                        for (int i = 0; i < dataList.size(); i++) {
+//                            if (time == dataList.get(i).costDay) {
+//                                index = i;
+//                            }
+//                        }
+//                        costMonth.costDay = time;
+//                        if (index != -1) {
+//                            dataList.add(index, costMonth);
+//                        } else {
+//                            if (dataList.size() == 0) {
+//                                dataList.add(costMonth);
+//                            } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
+//                                dataList.add(costMonth);
+//                            } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
+//                                for (int i = 0; i < dataList.size(); i++) {
+//                                    if (time < dataList.get(i).costDay) {
+//                                        index = i;
+//                                        break;
+//                                    }
+//                                }
+//                                dataList.add(index + 1, costMonth);
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                popupWindow.dismiss();
+//                costAdapter.notifyDataSetChanged();
+//                if (isAdd) {
+//                    LogDetails.i("增加成功");
+//                    showToastShort("增加成功");
+//                } else {
+//                    LogDetails.i("修改成功");
+//                    showToastShort("修改成功");
+//                }
+//            }
+//        });
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                popupWindow.dismiss();
+//            }
+//        });
+    }
+
     @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
-//                showAddModifyPop(-1, true);
-                accessGreenDao();
+                addData();
                 break;
             case R.id.btn_clear:
                 dataList.clear();
                 LogDetails.i("size-" + dataList.size());
                 costAdapter.notifyDataSetChanged();
+                deleteAllData();
                 break;
             case R.id.btn_list:
                 LinearLayoutManager manager = new LinearLayoutManager(MonthDailyActivity.this, LinearLayoutManager.VERTICAL, false);
@@ -332,32 +546,41 @@ public class MonthDailyActivity extends BaseActivity {
     }
 
     // TODO: 2016/8/7 入口需要调整
-    private void accessGreenDao() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "md_db", null);
-        SQLiteDatabase writableDatabase = helper.getWritableDatabase();
-        DaoMaster daoMaster = new DaoMaster(writableDatabase);
-        DaoSession daoSession = daoMaster.newSession();
-        CostMonthDao costMonthDao = daoSession.getCostMonthDao();
+    private void initDatabase() {
+        devOpenHelper = new DaoMaster.DevOpenHelper(this, "md_db", null);
+        writableDatabase = devOpenHelper.getWritableDatabase();
+        daoMaster = new DaoMaster(writableDatabase);
+        daoSession = daoMaster.newSession();
+        costMonthDao = daoSession.getCostMonthDao();
         CostMonth costMonth = new CostMonth();
-        costMonth.setCostDay(23);
-//                costMonth.setId(10);
-        costMonth.setCostTitle("aatitle");
-        costMonth.setCostDetail("aadetail");
-        costMonth.setCostPrice("88.26");
-//        costMonth = new CostMonth(0,23,"aatitle","aadetail","88.32");
+    }
+
+    private void addItem(CostMonth costMonth) {
         costMonthDao.insertOrReplace(costMonth);
         QueryBuilder.LOG_SQL = true;
         QueryBuilder.LOG_VALUES = true;
         LogDetails.i(costMonthDao.count() + "\n" + costMonthDao.queryBuilder().list() + "\n" + costMonthDao.getKey(costMonth) + "\n" + costMonthDao.getPkProperty().columnName);
         LogDetails.i(costMonthDao.queryBuilder().where(CostMonthDao.Properties.CostDay.eq(23)).orderAsc(CostMonthDao.Properties.Id).list());
-        daoSession = null;
-        helper.close();
-        helper = null;
+    }
+
+    private void updateItem(CostMonth costMonth) {
+        costMonthDao.update(costMonth);
+    }
+
+    private void deleteItem(CostMonth costMonth) {
+        costMonthDao.delete(costMonth);
+    }
+
+    private void deleteAllData() {
+        costMonthDao.deleteAll();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        daoSession = null;
+        devOpenHelper.close();
+        devOpenHelper = null;
         ButterKnife.unbind(this);
+        super.onDestroy();
     }
 }

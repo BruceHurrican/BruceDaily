@@ -49,6 +49,7 @@
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginBottom="5dp"
         android:background="@drawable/bgbtn2"
         android:text="增加记录"
         android:textColor="#fff"
@@ -58,24 +59,28 @@
         android:id="@+id/btn_clear"
         android:layout_width="80dp"
         android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@id/btn_add"
         android:layout_alignParentRight="true"
         android:background="@drawable/bgbtn2"
         android:text="清除当月所有记录"
         android:textColor="#fff"
         android:textSize="16sp"/>
 
-    <LinearLayout
-        android:id="@+id/ll_container"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/btn_add"
         android:layout_alignTop="@id/btn_add"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_toLeftOf="@id/btn_clear"
         android:layout_toRightOf="@id/btn_add"
-        android:background="#ffcc99"
+        android:background="#ffcc99">
+
+        <LinearLayout
+            android:id="@+id/ll_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -123,7 +128,9 @@
             android:textColor="#af00"
             android:textSize="16sp"
             tools:ignore="HardcodedText"/>
+
     </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/tv_rv_type"

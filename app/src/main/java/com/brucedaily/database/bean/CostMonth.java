@@ -40,23 +40,38 @@ import org.greenrobot.greendao.annotation.Unique;
 @Entity(nameInDb = "t_CostMonth")
 public class CostMonth {
 
+    /**
+     * 自增,无需赋值
+     */
     @Id(autoincrement = true)
     @Unique
-    private Long id;
+    public Long id;
 
+    /**
+     * 消费日期
+     */
     @Property(nameInDb = "costDay")
-    private int costDay;
+    public int costDay;
 
+    /**
+     * 消费项目标题
+     */
     @Property(nameInDb = "costTitle")
     @NotNull
-    private String costTitle;
+    public String costTitle;
 
+    /**
+     * 消费项目详情
+     */
     @Property(nameInDb = "costDetail")
-    private String costDetail;
+    public String costDetail;
 
+    /**
+     * 消费项目价格
+     */
     @Property(nameInDb = "costPrice")
     @NotNull
-    private String costPrice;
+    public String costPrice;
 
     @Generated
     public CostMonth() {
@@ -75,52 +90,52 @@ public class CostMonth {
         this.costPrice = costPrice;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getCostDay() {
-        return costDay;
-    }
-
-    public void setCostDay(int costDay) {
-        this.costDay = costDay;
-    }
-
-    @NotNull
-    public String getCostTitle() {
-        return costTitle;
-    }
-
-    /**
-     * Not-null value; ensure this value is available before it is saved to the database.
-     */
-    public void setCostTitle(@NotNull String costTitle) {
-        this.costTitle = costTitle;
-    }
-
-    public String getCostDetail() {
-        return costDetail;
-    }
-
-    public void setCostDetail(String costDetail) {
-        this.costDetail = costDetail;
-    }
-
-    @NotNull
-    public String getCostPrice() {
-        return costPrice;
-    }
-
-    /**
-     * Not-null value; ensure this value is available before it is saved to the database.
-     */
-    public void setCostPrice(@NotNull String costPrice) {
-        this.costPrice = costPrice;
-    }
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
+//
+//    public int getCostDay() {
+//        return costDay;
+//    }
+//
+//    public void setCostDay(int costDay) {
+//        this.costDay = costDay;
+//    }
+//
+//    @NotNull
+//    public String getCostTitle() {
+//        return costTitle;
+//    }
+//
+//    /**
+//     * Not-null value; ensure this value is available before it is saved to the database.
+//     */
+//    public void setCostTitle(@NotNull String costTitle) {
+//        this.costTitle = costTitle;
+//    }
+//
+//    public String getCostDetail() {
+//        return costDetail;
+//    }
+//
+//    public void setCostDetail(String costDetail) {
+//        this.costDetail = costDetail;
+//    }
+//
+//    @NotNull
+//    public String getCostPrice() {
+//        return costPrice;
+//    }
+//
+//    /**
+//     * Not-null value; ensure this value is available before it is saved to the database.
+//     */
+//    public void setCostPrice(@NotNull String costPrice) {
+//        this.costPrice = costPrice;
+//    }
 
 }

@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.brucedaily.R;
+import com.brucedaily.database.bean.CostMonth;
 import com.bruceutils.utils.logdetails.LogDetails;
 
 import java.util.List;
@@ -42,15 +43,16 @@ import java.util.List;
  * Created by BruceHurrican on 2016/7/24.
  */
 public class CostAdapter extends RecyclerView.Adapter<CostAdapter.CostViewHolder> {
-    private List<CostBean> dataList;
+    private List<CostMonth> dataList;
     private CardViewItemClickListener itemClickListener;
     private CardViewItemLongClickListener itemLongClickListener;
 
-    public CostAdapter(List<CostBean> dataList) {
-        if (null == dataList || dataList.size() == 0) {
-            LogDetails.d("输入数据不能空");
-            return;
-        }
+    public CostAdapter(List<CostMonth> dataList) {
+//        if (null == dataList || dataList.size() == 0) {
+//            LogDetails.d("输入数据不能空");
+//            return;
+//        }
+        LogDetails.i("dataList->" + dataList);
         this.dataList = dataList;
     }
 
@@ -71,9 +73,9 @@ public class CostAdapter extends RecyclerView.Adapter<CostAdapter.CostViewHolder
 
     @Override
     public void onBindViewHolder(CostViewHolder holder, final int position) {
-        holder.tvDate.setText(dataList.get(position).date + "");
-        holder.tvContent.setText(dataList.get(position).title);
-        holder.tvPrice.setText(dataList.get(position).price + "");
+        holder.tvDate.setText(dataList.get(position).costDay + "");
+        holder.tvContent.setText(dataList.get(position).costTitle);
+        holder.tvPrice.setText(dataList.get(position).costPrice + "");
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
