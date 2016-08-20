@@ -58,18 +58,17 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
      * Creates the underlying database table.
      */
     public static void createTable(Database db, boolean ifNotExists) {
-        String constraint = ifNotExists ? "IF NOT EXISTS " : "";
+        String constraint = ifNotExists ? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"t_CostMonth\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE ," + // 0: id
                 "\"costDay\" Int NOT NULL ," + // 1: costDay
                 "\"costTitle\" String NOT NULL ," + // 2: costTitle
                 "\"costDetail\" String," + // 3: costDetail
-                "\"costPrice\" String NOT NULL );"); // 4: costPrice
+                "\"costPrice\" String NOT NULL ," + // 4: costPrice
+                "\"costModifyDate\" Date NOT NULL );"); // 5: costModifyDate
     }
 
-    /**
-     * Drops the underlying database table.
-     */
+    /** Drops the underlying database table. */
     public static void dropTable(Database db, boolean ifExists) {
         String sql = "DROP TABLE " + (ifExists ? "IF EXISTS " : "") + "\"t_CostMonth\"";
         db.execSQL(sql);
@@ -91,6 +90,7 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
             stmt.bindString(4, costDetail);
         }
         stmt.bindString(5, entity.costPrice);
+        stmt.bindLong(6, entity.costModifyDate.getTime());
     }
 
     @Override
@@ -109,6 +109,7 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
             stmt.bindString(4, costDetail);
         }
         stmt.bindString(5, entity.costPrice);
+        stmt.bindLong(6, entity.costModifyDate.getTime());
     }
 
     @Override
@@ -123,7 +124,8 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
                 cursor.getInt(offset + 1), // costDay
                 cursor.getString(offset + 2), // costTitle
                 cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // costDetail
-                cursor.getString(offset + 4) // costPrice
+                cursor.getString(offset + 4), // costPrice
+                new java.util.Date(cursor.getLong(offset + 5)) // costModifyDate
         );
         return entity;
     }
@@ -135,6 +137,7 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
         entity.costTitle = cursor.getString(offset + 2);
         entity.costDetail = cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3);
         entity.costPrice = cursor.getString(offset + 4);
+        entity.costModifyDate = new java.util.Date(cursor.getLong(offset + 5));
     }
 
     @Override
@@ -151,16 +154,11 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
             return null;
         }
     }
-
+    
     @Override
     protected final boolean isEntityUpdateable() {
         return true;
     }
-
-//    @Override
-//    public boolean hasKey(CostMonth entity) {
-//        return entity.getId() != null;
-//    }
 
     /**
      * Properties of entity CostMonth.<br/>
@@ -172,6 +170,7 @@ public class CostMonthDao extends AbstractDao<CostMonth, Long> {
         public final static Property CostTitle = new Property(2, String.class, "costTitle", false, "costTitle");
         public final static Property CostDetail = new Property(3, String.class, "costDetail", false, "costDetail");
         public final static Property CostPrice = new Property(4, String.class, "costPrice", false, "costPrice");
+        public final static Property CostModifyDate = new Property(5, java.util.Date.class, "costModifyDate", false, "costModifyDate");
     }
-
+    
 }

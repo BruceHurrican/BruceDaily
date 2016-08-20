@@ -52,6 +52,8 @@ public class BeanGenerator {
     public static final String COST_DETAIL = "costDetail";
     /* 字段名称 消费金额 */
     public static final String COST_PRICE = "costPrice";
+    /* 字段名称 修改日期 */
+    public static final String COST_MODIFY_DATE = "costModifyDate";
     /* 生成对象所在包名 */
     public static final String PACKAGE_NAME = "com.brucedaily.database.bean";
     /* 生成 dao */
@@ -72,6 +74,7 @@ public class BeanGenerator {
             month.addStringProperty(COST_TITLE).columnName(COST_TITLE).columnType(PropertyType.String.toString()).notNull();
             month.addStringProperty(COST_DETAIL).columnName(COST_DETAIL).columnType(PropertyType.String.toString());
             month.addStringProperty(COST_PRICE).columnName(COST_PRICE).columnType(PropertyType.String.toString()).notNull();
+            month.addDateProperty(COST_MODIFY_DATE).columnName(COST_MODIFY_DATE).columnType(PropertyType.Date.toString()).notNull();
             schema.setDefaultJavaPackageDao(DB_DAO);
             daoGenerator.generateAll(schema, PACKAGE_DIR);
         } catch (IOException e) {

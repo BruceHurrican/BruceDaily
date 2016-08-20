@@ -42,17 +42,21 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.brucedaily.AppUtils;
 import com.brucedaily.R;
 import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.database.dao.CostMonthDao;
 import com.brucedaily.database.dao.DaoMaster;
 import com.brucedaily.database.dao.DaoSession;
 import com.bruceutils.base.BaseActivity;
+import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -138,8 +142,8 @@ public class MonthDailyActivity extends BaseActivity {
     }
 
     private void initData() {
-        // 查询结果集按日期升序排序，如果日期相同则按id降序排序
-        dataList = costMonthDao.queryBuilder().orderAsc(CostMonthDao.Properties.CostDay).orderDesc(CostMonthDao.Properties.Id).list();
+        // 查询结果集按日期降序排序，如果日期相同则按id降序排序
+        dataList = costMonthDao.queryBuilder().orderDesc(CostMonthDao.Properties.CostDay).orderDesc(CostMonthDao.Properties.CostModifyDate).list();
         LogDetails.i("dataList 是否为空? " + (null == dataList));
         if (dataList == null) {
             dataList = new ArrayList<>(1);
@@ -167,8 +171,8 @@ public class MonthDailyActivity extends BaseActivity {
         for (int i = 0; i < tmpList.size(); i++) {
             monthEarly += Float.valueOf(tmpList.get(i).costPrice);
         }
-        LogDetails.i("当月上旬花费共计 %f 元", monthEarly);
-        tvCountEarly.setText("上旬消费统计: " + monthEarly);
+        LogDetails.i(String.format("当月上旬花费共计 %s 元", AppUtils.float2StringPrice(monthEarly)));
+        tvCountEarly.setText(String.format("上旬消费统计 %s 元", AppUtils.float2StringPrice(monthEarly)));
 
         // 中旬花费
         float monthMiddle = 0;
@@ -177,8 +181,8 @@ public class MonthDailyActivity extends BaseActivity {
         for (int i = 0; i < tmpList.size(); i++) {
             monthMiddle += Float.valueOf(tmpList.get(i).costPrice);
         }
-        LogDetails.i("当月中旬花费共计 %f 元", monthMiddle);
-        tvCountMiddle.setText("中旬消费统计: " + monthMiddle);
+        LogDetails.i(String.format("当月中旬花费共计 %s 元", AppUtils.float2StringPrice(monthMiddle)));
+        tvCountMiddle.setText(String.format("中旬消费统计 %s 元", AppUtils.float2StringPrice(monthMiddle)));
 
         // 下旬花费
         float monthLast = 0;
@@ -187,11 +191,11 @@ public class MonthDailyActivity extends BaseActivity {
         for (int i = 0; i < tmpList.size(); i++) {
             monthLast += Float.valueOf(tmpList.get(i).costPrice);
         }
-        LogDetails.i("当月下旬花费共计 %f 元", monthLast);
-        tvCountLast.setText("下旬消费统计: " + monthLast);
+        LogDetails.i(String.format("当月下旬花费共计 %s 元", AppUtils.float2StringPrice(monthLast)));
+        tvCountLast.setText(String.format("下旬消费统计 %s 元", AppUtils.float2StringPrice(monthLast)));
 
         float monthRemain = total - monthEarly - monthMiddle - monthLast;
-        tvRemain.setText("月预算余额: " + monthRemain);
+        tvRemain.setText(String.format("月预算余额: %s 元", AppUtils.float2StringPrice(monthRemain)));
 
     }
 
@@ -256,6 +260,7 @@ public class MonthDailyActivity extends BaseActivity {
      * 刷新列表数据和统计数据
      */
     private void refreshData() {
+        Collections.sort(dataList);
         costAdapter.notifyDataSetChanged();
         monthCount();
     }
@@ -296,6 +301,14 @@ public class MonthDailyActivity extends BaseActivity {
                 String content = etContent.getEditableText().toString().trim();
                 String tmpTime = etTime.getEditableText().toString().trim();
                 String price = etPrice.getEditableText().toString().trim();
+                if (TextUtils.isEmpty(price)) {
+                    price = etPrice.getHint().toString().trim();
+                }
+                if (!AppUtils.isPriceValid(price)) {
+                    LogUtils.e("输入的价格不符合格式规范");
+                    showToastShort("输入的价格不符合格式规范");
+                    return;
+                }
                 if (isAdd) {
                     if (!addCostRecord(title, content, tmpTime, price)) {
                         LogDetails.i("增加记录失败");
@@ -366,34 +379,35 @@ public class MonthDailyActivity extends BaseActivity {
             costMonth.costDay = time;
             dataList.remove(position);
             CostMonth tmpCostMonth = costMonth;
-            int index = -1;
-            for (int i = 0; i < dataList.size(); i++) {
-                if (time == dataList.get(i).costDay) {
-                    index = i;
-                    break;
-                }
-            }
-            LogDetails.i("index-" + index);
-            tmpCostMonth.costDay = time;
-            LogDetails.i("tmpCostMonth - %s", tmpCostMonth);
-            if (index != -1) {
-                dataList.add(index, tmpCostMonth);
-            } else {
-                if (dataList.size() == 0) {
-                    dataList.add(tmpCostMonth);
-                } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
-                    dataList.add(tmpCostMonth);
-                } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
-                    for (int i = 0; i < dataList.size(); i++) {
-                        if (time < dataList.get(i).costDay) {
-                            index = i; // 获取相同日期的索引
-                            break;
-                        }
-                    }
-                    // 将数据插入到相同日期的最前端
-                    dataList.add(index, tmpCostMonth);
-                }
-            }
+//            int index = -1;
+//            for (int i = 0; i < dataList.size(); i++) {
+//                if (time == dataList.get(i).costDay) {
+//                    index = i;
+//                    break;
+//                }
+//            }
+//            LogDetails.i("index-" + index);
+//            tmpCostMonth.costDay = time;
+//            LogDetails.i("tmpCostMonth - %s", tmpCostMonth);
+//            if (index != -1) {
+//                dataList.add(index, tmpCostMonth);
+//            } else {
+//                if (dataList.size() == 0) {
+//                    dataList.add(tmpCostMonth);
+//                } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
+//                    dataList.add(tmpCostMonth);
+//                } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
+//                    for (int i = 0; i < dataList.size(); i++) {
+//                        if (time < dataList.get(i).costDay) {
+//                            index = i; // 获取相同日期的索引
+//                            break;
+//                        }
+//                    }
+//                    // 将数据插入到相同日期的最前端
+//                    dataList.add(index, tmpCostMonth);
+//                }
+//            }
+            dataList.add(tmpCostMonth);
             addItem(tmpCostMonth);
         }
         LogDetails.i("修改成功");
@@ -432,33 +446,34 @@ public class MonthDailyActivity extends BaseActivity {
         if (dataList.size() == 0) {
             dataList.add(costMonth);
         } else {
-            int index = -1;
-            for (int i = 0; i < dataList.size(); i++) {
-                if (time == dataList.get(i).costDay) {
-                    index = i; // 获取相同日期的索引
-                    break;
-                }
-            }
-            LogDetails.i("index-" + index);
-            if (index != -1) {
-                // 将数据插入到相同日期的最前端
-                dataList.add(index, costMonth);
-            } else {
-                if (time > dataList.get(dataList.size() - 1).costDay) {
-                    // 新增日期大于表中日期
-                    dataList.add(costMonth);
-                } else if (time < dataList.get(dataList.size() - 1).costDay) {
-                    // 新增日期小于表中日期
-                    for (int i = 0; i < dataList.size(); i++) {
-                        if (time < dataList.get(i).costDay) {
-                            index = i; // 获取表中最小日期索引
-                            break;
-                        }
-                    }
-                    // 将数据插入到相同日期的最前端
-                    dataList.add(index, costMonth);
-                }
-            }
+//            int index = -1;
+//            for (int i = 0; i < dataList.size(); i++) {
+//                if (time == dataList.get(i).costDay) {
+//                    index = i; // 获取相同日期的索引
+//                    break;
+//                }
+//            }
+//            LogDetails.i("index-" + index);
+//            if (index != -1) {
+//                // 将数据插入到相同日期的最前端
+//                dataList.add(index, costMonth);
+//            } else {
+//                if (time > dataList.get(dataList.size() - 1).costDay) {
+//                    // 新增日期大于表中日期
+//                    dataList.add(costMonth);
+//                } else if (time < dataList.get(dataList.size() - 1).costDay) {
+//                    // 新增日期小于表中日期
+//                    for (int i = 0; i < dataList.size(); i++) {
+//                        if (time < dataList.get(i).costDay) {
+//                            index = i; // 获取表中最小日期索引
+//                            break;
+//                        }
+//                    }
+//                    // 将数据插入到相同日期的最前端
+//                    dataList.add(index, costMonth);
+//                }
+//            }
+            dataList.add(costMonth);
         }
         addItem(costMonth);
         LogDetails.i("增加数据成功");
@@ -490,14 +505,15 @@ public class MonthDailyActivity extends BaseActivity {
     }
 
     private void addItem(CostMonth costMonth) {
+        costMonth.costModifyDate = new Date(System.currentTimeMillis());
         costMonthDao.insertOrReplace(costMonth);
         QueryBuilder.LOG_SQL = true;
         QueryBuilder.LOG_VALUES = true;
         LogDetails.i(costMonthDao.count() + "\n" + costMonthDao.queryBuilder().list() + "\n" + costMonthDao.getKey(costMonth) + "\n" + costMonthDao.getPkProperty().columnName);
-        LogDetails.i(costMonthDao.queryBuilder().where(CostMonthDao.Properties.CostDay.eq(23)).orderAsc(CostMonthDao.Properties.Id).list());
     }
 
     private void updateItem(CostMonth costMonth) {
+        costMonth.costModifyDate = new Date(System.currentTimeMillis());
         costMonthDao.update(costMonth);
     }
 
