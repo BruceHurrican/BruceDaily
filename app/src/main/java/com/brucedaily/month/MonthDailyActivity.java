@@ -266,7 +266,7 @@ public class MonthDailyActivity extends BaseActivity {
     }
 
     /**
-     * 操作消费记录,当前只支持 “增加” 和 “删除” 操作
+     * 操作消费记录,当前只支持 “增加” 和 “修改” 操作
      *
      * @param position
      * @param isAdd
@@ -292,7 +292,8 @@ public class MonthDailyActivity extends BaseActivity {
         popupWindow.setTouchable(true);
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
+//        popupWindow.showAtLocation(rlRoot, Gravity.TOP, 0, 0);
+        popupWindow.showAsDropDown(tvTitle);
 
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
