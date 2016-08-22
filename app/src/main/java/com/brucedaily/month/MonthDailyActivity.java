@@ -48,7 +48,7 @@ import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.database.dao.CostMonthDao;
 import com.brucedaily.database.dao.DaoMaster;
 import com.brucedaily.database.dao.DaoSession;
-import com.bruceutils.base.BaseActivity;
+import com.bruceutils.base.BaseFragmentActivity;
 import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
 
@@ -67,7 +67,7 @@ import butterknife.OnClick;
  * 按月统计消费金额
  * Created by BruceHurrican on 2016/7/24.
  */
-public class MonthDailyActivity extends BaseActivity {
+public class MonthDailyActivity extends BaseFragmentActivity {
     @Bind(R.id.tv_title)
     TextView tvTitle;
     @Bind(R.id.btn_add)
@@ -302,20 +302,18 @@ public class MonthDailyActivity extends BaseActivity {
                 String content = etContent.getEditableText().toString().trim();
                 String tmpTime = etTime.getEditableText().toString().trim();
                 String price = etPrice.getEditableText().toString().trim();
-                if (TextUtils.isEmpty(price)) {
-                    price = etPrice.getHint().toString().trim();
-                }
-                if (!AppUtils.isPriceValid(price)) {
-                    LogUtils.e("输入的价格不符合格式规范");
-                    showToastShort("输入的价格不符合格式规范");
-                    return;
-                }
                 if (isAdd) {
                     if (!addCostRecord(title, content, tmpTime, price)) {
                         LogDetails.i("增加记录失败");
                         return;
                     }
                 } else {
+                    if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+                        LogDetails.w("数据未做任何修改");
+                        showToastShort("亲,未修改任何信息喔~");
+                        popupWindow.dismiss();
+                        return;
+                    }
                     if (!modifyCostRecord(position, title, content, tmpTime, price)) {
                         LogDetails.i("修改消费记录失败");
                         return;
@@ -346,9 +344,9 @@ public class MonthDailyActivity extends BaseActivity {
      */
     private boolean modifyCostRecord(int position, String title, String content, String tmpTime, String price) {
         CostMonth costMonth = dataList.get(position);
-        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
-            LogDetails.w("数据未做任何修改");
-            showToastShort("亲,未修改任何信息喔~");
+        if (!AppUtils.isPriceValid(price)) {
+            LogUtils.e("输入的价格不符合格式规范");
+            showToastShort("输入的价格不符合格式规范");
             return false;
         }
         int time = 0;
@@ -426,9 +424,14 @@ public class MonthDailyActivity extends BaseActivity {
      * @return true 增加记录成功
      */
     private boolean addCostRecord(String title, String content, String tmpTime, String price) {
-        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+        if (TextUtils.isEmpty(title) || TextUtils.isEmpty(tmpTime) || TextUtils.isEmpty(price)) {
             LogDetails.i("必填项不能为空");
             showToastShort("必填项不能为空");
+            return false;
+        }
+        if (!AppUtils.isPriceValid(price)) {
+            LogUtils.e("输入的价格不符合格式规范");
+            showToastShort("输入的价格不符合格式规范");
             return false;
         }
         int time = Integer.valueOf(tmpTime);

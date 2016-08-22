@@ -78,6 +78,10 @@ public class AppUtils {
      * @return true 合法
      */
     public static boolean isPriceValid(String price) {
+        if (TextUtils.isEmpty(price)) {
+            LogUtils.i("price ->" + price);
+            return false;
+        }
         Pattern pattern = Pattern.compile("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){0,2})?$");//判断小数点后一位的数字的正则表达式
         Matcher matcher = pattern.matcher(price);
         return matcher.matches();
