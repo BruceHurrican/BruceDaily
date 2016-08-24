@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ BruceHurrican
-  ~ Copyright (c) 2016.
-  ~    Licensed under the Apache License, Version 2.0 (the "License");
-  ~    you may not use this file except in compliance with the License.
-  ~    You may obtain a copy of the License at
+  ~  Copyright (c) 2016.
+  ~     Licensed under the Apache License, Version 2.0 (the "License");
+  ~     you may not use this file except in compliance with the License.
+  ~     You may obtain a copy of the License at
   ~
-  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~    Unless required by applicable law or agreed to in writing, software
-  ~    distributed under the License is distributed on an "AS IS" BASIS,
-  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~    See the License for the specific language governing permissions and
-  ~    limitations under the License.
+  ~     Unless required by applicable law or agreed to in writing, software
+  ~     distributed under the License is distributed on an "AS IS" BASIS,
+  ~     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~     See the License for the specific language governing permissions and
+  ~     limitations under the License.
   ~
-  ~    This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
-  ~    And where any person can download and use, but not for commercial purposes.
-  ~    Author does not assume the resulting corresponding disputes.
-  ~    If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
-  ~    本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
-  ~    任和何人可以下载并使用, 但是不能用于商业用途。
-  ~    作者不承担由此带来的相应纠纷。
-  ~    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
+  ~     This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
+  ~     And where any person can download and use, but not for commercial purposes.
+  ~     Author does not assume the resulting corresponding disputes.
+  ~     If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
+  ~     本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
+  ~     任和何人可以下载并使用, 但是不能用于商业用途。
+  ~     作者不承担由此带来的相应纠纷。
+  ~     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,8 +36,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp">
 
-        <EditText
-            android:id="@+id/et_title"
+        <AutoCompleteTextView
+            android:id="@+id/actw_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -45,6 +45,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:background="@color/monthCount"
+            android:completionThreshold="1"
             android:gravity="center"
             android:hint="标题(必填项)"
             android:singleLine="true"
@@ -52,13 +53,14 @@
             android:textSize="26sp"
             tool:ignore="HardcodedText"/>
 
-        <EditText
-            android:id="@+id/et_content"
+        <AutoCompleteTextView
+            android:id="@+id/actw_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_title"
+            android:layout_below="@id/actw_title"
             android:layout_margin="5dp"
             android:background="@color/colorPrimary"
+            android:completionThreshold="1"
             android:gravity="left|top"
             android:hint="消费项目(可以不填)"
             android:lines="6"
@@ -72,14 +74,14 @@
             android:id="@+id/ll_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/et_content"
-            android:layout_alignRight="@id/et_content"
-            android:layout_below="@id/et_content"
+            android:layout_alignLeft="@id/actw_content"
+            android:layout_alignRight="@id/actw_content"
+            android:layout_below="@id/actw_content"
             android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/et_time"
+            <AutoCompleteTextView
+                android:id="@+id/actw_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
@@ -115,8 +117,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/et_content"
-            android:layout_alignRight="@id/et_content"
+            android:layout_alignLeft="@id/actw_content"
+            android:layout_alignRight="@id/actw_content"
             android:layout_below="@id/ll_content"
             android:orientation="horizontal">
 

@@ -1,26 +1,26 @@
 /*
  * BruceHurrican
- * Copyright (c) 2016.
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *  Copyright (c) 2016.
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
  *
- *    This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
- *    And where any person can download and use, but not for commercial purposes.
- *    Author does not assume the resulting corresponding disputes.
- *    If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
- *    本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
- *    任和何人可以下载并使用, 但是不能用于商业用途。
- *    作者不承担由此带来的相应纠纷。
- *    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
+ *     This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
+ *     And where any person can download and use, but not for commercial purposes.
+ *     Author does not assume the resulting corresponding disputes.
+ *     If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
+ *     本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
+ *     任和何人可以下载并使用, 但是不能用于商业用途。
+ *     作者不承担由此带来的相应纠纷。
+ *     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
 package com.brucedaily.month;
@@ -35,8 +35,8 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -52,6 +52,9 @@ import com.bruceutils.base.BaseFragmentActivity;
 import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
@@ -68,6 +71,26 @@ import butterknife.OnClick;
  * Created by BruceHurrican on 2016/7/24.
  */
 public class MonthDailyActivity extends BaseFragmentActivity {
+    /**
+     * 是否是添加数据
+     */
+    public static final String KEY_IS_ADD = "isAdd";
+    /**
+     * 消费标题
+     */
+    public static final String KEY_COST_TITLE = "costTitle";
+    /**
+     * 消费详情
+     */
+    public static final String KEY_COST_DETAIL = "costDetail";
+    /**
+     * 消费日期
+     */
+    public static final String KEY_COST_DAY = "costDay";
+    /**
+     * 消费价格
+     */
+    public static final String KEY_COST_PRICE = "costPrice";
     @Bind(R.id.tv_title)
     TextView tvTitle;
     @Bind(R.id.btn_add)
@@ -106,11 +129,14 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     private DaoSession daoSession;
     private DaoMaster daoMaster;
 
+    private int position; // 待修改数据位置
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.month_activity_daily);
         ButterKnife.bind(this);
+        EventBus.getDefault().register(this);
         initDatabase();
         initData();
 
@@ -272,64 +298,108 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      * @param isAdd
      */
     private void operateCostRecord(final int position, final boolean isAdd) {
+        this.position = position;
         LogDetails.i("position-%s", position);
-        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
-        final EditText etTitle = (EditText) view.findViewById(R.id.et_title);
-        final EditText etContent = (EditText) view.findViewById(R.id.et_content);
-        final EditText etTime = (EditText) view.findViewById(R.id.et_time);
-        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
-        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
-        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+//        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
+//        final AutoCompleteTextView actwTitle = (AutoCompleteTextView) view.findViewById(R.id.actw_title);
+//        final AutoCompleteTextView actwContent = (AutoCompleteTextView) view.findViewById(R.id.actw_content);
+//        final AutoCompleteTextView actwTime = (AutoCompleteTextView) view.findViewById(R.id.actw_time);
+//        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
+//        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
+//        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+//
+//        if (!isAdd) {
+//            actwTitle.setHint(dataList.get(position).costTitle);
+//            actwContent.setHint(dataList.get(position).costDetail);
+//            actwTime.setHint(dataList.get(position).costDay + "");
+//            etPrice.setHint(dataList.get(position).costPrice);
+//        }
 
+
+        MonthAddModifyFragment monthAddModifyFragment = new MonthAddModifyFragment();
+        Bundle bundle = new Bundle();
         if (!isAdd) {
-            etTitle.setHint(dataList.get(position).costTitle);
-            etContent.setHint(dataList.get(position).costDetail);
-            etTime.setHint(dataList.get(position).costDay + "");
-            etPrice.setHint(dataList.get(position).costPrice);
+            bundle.putBoolean(KEY_IS_ADD, false);
+            bundle.putString(KEY_COST_TITLE, dataList.get(position).costTitle);
+            bundle.putString(KEY_COST_DETAIL, dataList.get(position).costDetail);
+            bundle.putString(KEY_COST_DAY, dataList.get(position).costDay + "");
+            bundle.putString(KEY_COST_PRICE, dataList.get(position).costPrice);
+        } else {
+            bundle.putBoolean(KEY_IS_ADD, true);
         }
+        monthAddModifyFragment.setArguments(bundle);
 
-        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-//        popupWindow.showAtLocation(rlRoot, Gravity.TOP, 0, 0);
-        popupWindow.showAsDropDown(tvTitle);
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, monthAddModifyFragment).commit();
 
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = etTitle.getEditableText().toString().trim();
-                String content = etContent.getEditableText().toString().trim();
-                String tmpTime = etTime.getEditableText().toString().trim();
-                String price = etPrice.getEditableText().toString().trim();
-                if (isAdd) {
-                    if (!addCostRecord(title, content, tmpTime, price)) {
-                        LogDetails.i("增加记录失败");
-                        return;
-                    }
-                } else {
-                    if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
-                        LogDetails.w("数据未做任何修改");
-                        showToastShort("亲,未修改任何信息喔~");
-                        popupWindow.dismiss();
-                        return;
-                    }
-                    if (!modifyCostRecord(position, title, content, tmpTime, price)) {
-                        LogDetails.i("修改消费记录失败");
-                        return;
-                    }
-                }
-                refreshData();
-                popupWindow.dismiss();
-            }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-            }
-        });
+//        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        popupWindow.setTouchable(true);
+//        popupWindow.setFocusable(true);
+//        popupWindow.setOutsideTouchable(true);
+////        popupWindow.showAtLocation(rlRoot, Gravity.TOP, 0, 0);
+//        popupWindow.showAsDropDown(tvTitle);
+//
+//        initACTWdata(actwTitle, actwContent, actwTime);
+//
+//        actwTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus){
+//                    ((AutoCompleteTextView)v.getParent()).showDropDown();
+//                }
+//            }
+//        });
+//        actwContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus){
+//                    ((AutoCompleteTextView)v).showDropDown();
+//                }
+//            }
+//        });
+//        actwTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (hasFocus){
+//                    ((AutoCompleteTextView)v).showDropDown();
+//                }
+//            }
+//        });
+//
+//        btnOk.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String title = actwTitle.getEditableText().toString().trim();
+//                String content = actwContent.getEditableText().toString().trim();
+//                String tmpTime = actwTime.getEditableText().toString().trim();
+//                String price = etPrice.getEditableText().toString().trim();
+//                if (isAdd) {
+//                    if (!addCostRecord(title, content, tmpTime, price)) {
+//                        LogDetails.i("增加记录失败");
+//                        return;
+//                    }
+//                } else {
+//                    if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
+//                        LogDetails.w("数据未做任何修改");
+//                        showToastShort("亲,未修改任何信息喔~");
+//                        popupWindow.dismiss();
+//                        return;
+//                    }
+//                    if (!modifyCostRecord(position, title, content, tmpTime, price)) {
+//                        LogDetails.i("修改消费记录失败");
+//                        return;
+//                    }
+//                }
+//                refreshData();
+//                popupWindow.dismiss();
+//            }
+//        });
+//
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                popupWindow.dismiss();
+//            }
+//        });
     }
 
     /**
@@ -485,6 +555,31 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         return true;
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getDataFromFragment(MsgBean msgBean) {
+        LogUtils.i("position-> " + position);
+        LogDetails.i(msgBean);
+        InputMethodManager im = ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE));
+        if (im.isActive() && getCurrentFocus() != null) {
+            im.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+        if (null == msgBean) {
+            return;
+        }
+        if (msgBean.isAdd) {
+            if (!addCostRecord(msgBean.title, msgBean.content, msgBean.time, msgBean.price)) {
+                LogDetails.i("增加记录失败");
+                return;
+            }
+        } else {
+            if (!modifyCostRecord(position, msgBean.title, msgBean.content, msgBean.time, msgBean.price)) {
+                LogDetails.i("修改消费记录失败");
+                return;
+            }
+        }
+        refreshData();
+    }
+
     @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -535,6 +630,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         devOpenHelper.close();
         devOpenHelper = null;
         ButterKnife.unbind(this);
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 }

@@ -23,34 +23,32 @@
  *     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
-apply plugin: 'com.android.application'
+package com.brucedaily.month;
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+/**
+ * eventbus 消息 bean
+ * Created by BruceHurrican on 16/8/22.
+ */
+public class MsgBean {
+    public boolean isAdd;
+    public String title, content, time, price;
 
-    defaultConfig {
-        applicationId "com.brucedaily"
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+    public MsgBean(boolean isAdd, String title, String content, String time, String price) {
+        this.isAdd = isAdd;
+        this.title = title;
+        this.content = content;
+        this.time = time;
+        this.price = price;
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile project(':bruceutils')
-    compile 'org.greenrobot:greendao:3.0.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
-    compile 'org.greenrobot:greendao-generator:3.1.0'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    @Override
+    public String toString() {
+        return "MsgBean{" +
+                "isAdd=" + isAdd +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", time='" + time + '\'' +
+                ", price='" + price + '\'' +
+                '}';
+    }
 }
