@@ -184,7 +184,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         costMonthDao = daoSession.getCostMonthDao();
     }
 
-    /**
+    /**mmbw qqwts
      * 月消费统计
      */
     private void monthCount() {
@@ -300,21 +300,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     private void operateCostRecord(final int position, final boolean isAdd) {
         this.position = position;
         LogDetails.i("position-%s", position);
-//        View view = getLayoutInflater().inflate(R.layout.month_item_add_modify, null);
-//        final AutoCompleteTextView actwTitle = (AutoCompleteTextView) view.findViewById(R.id.actw_title);
-//        final AutoCompleteTextView actwContent = (AutoCompleteTextView) view.findViewById(R.id.actw_content);
-//        final AutoCompleteTextView actwTime = (AutoCompleteTextView) view.findViewById(R.id.actw_time);
-//        final EditText etPrice = (EditText) view.findViewById(R.id.et_price);
-//        Button btnOk = (Button) view.findViewById(R.id.btn_ok);
-//        Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
-//
-//        if (!isAdd) {
-//            actwTitle.setHint(dataList.get(position).costTitle);
-//            actwContent.setHint(dataList.get(position).costDetail);
-//            actwTime.setHint(dataList.get(position).costDay + "");
-//            etPrice.setHint(dataList.get(position).costPrice);
-//        }
-
 
         MonthAddModifyFragment monthAddModifyFragment = new MonthAddModifyFragment();
         Bundle bundle = new Bundle();
@@ -331,75 +316,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
 
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content, monthAddModifyFragment).commit();
 
-//        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//        popupWindow.setTouchable(true);
-//        popupWindow.setFocusable(true);
-//        popupWindow.setOutsideTouchable(true);
-////        popupWindow.showAtLocation(rlRoot, Gravity.TOP, 0, 0);
-//        popupWindow.showAsDropDown(tvTitle);
-//
-//        initACTWdata(actwTitle, actwContent, actwTime);
-//
-//        actwTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus){
-//                    ((AutoCompleteTextView)v.getParent()).showDropDown();
-//                }
-//            }
-//        });
-//        actwContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus){
-//                    ((AutoCompleteTextView)v).showDropDown();
-//                }
-//            }
-//        });
-//        actwTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if (hasFocus){
-//                    ((AutoCompleteTextView)v).showDropDown();
-//                }
-//            }
-//        });
-//
-//        btnOk.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String title = actwTitle.getEditableText().toString().trim();
-//                String content = actwContent.getEditableText().toString().trim();
-//                String tmpTime = actwTime.getEditableText().toString().trim();
-//                String price = etPrice.getEditableText().toString().trim();
-//                if (isAdd) {
-//                    if (!addCostRecord(title, content, tmpTime, price)) {
-//                        LogDetails.i("增加记录失败");
-//                        return;
-//                    }
-//                } else {
-//                    if (TextUtils.isEmpty(title) && TextUtils.isEmpty(content) && TextUtils.isEmpty(tmpTime) && TextUtils.isEmpty(price)) {
-//                        LogDetails.w("数据未做任何修改");
-//                        showToastShort("亲,未修改任何信息喔~");
-//                        popupWindow.dismiss();
-//                        return;
-//                    }
-//                    if (!modifyCostRecord(position, title, content, tmpTime, price)) {
-//                        LogDetails.i("修改消费记录失败");
-//                        return;
-//                    }
-//                }
-//                refreshData();
-//                popupWindow.dismiss();
-//            }
-//        });
-//
-//        btnCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                popupWindow.dismiss();
-//            }
-//        });
     }
 
     /**
@@ -448,34 +364,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
             costMonth.costDay = time;
             dataList.remove(position);
             CostMonth tmpCostMonth = costMonth;
-//            int index = -1;
-//            for (int i = 0; i < dataList.size(); i++) {
-//                if (time == dataList.get(i).costDay) {
-//                    index = i;
-//                    break;
-//                }
-//            }
-//            LogDetails.i("index-" + index);
-//            tmpCostMonth.costDay = time;
-//            LogDetails.i("tmpCostMonth - %s", tmpCostMonth);
-//            if (index != -1) {
-//                dataList.add(index, tmpCostMonth);
-//            } else {
-//                if (dataList.size() == 0) {
-//                    dataList.add(tmpCostMonth);
-//                } else if (dataList.size() > 0 && time > dataList.get(dataList.size() - 1).costDay) {
-//                    dataList.add(tmpCostMonth);
-//                } else if (dataList.size() > 0 && time < dataList.get(dataList.size() - 1).costDay) {
-//                    for (int i = 0; i < dataList.size(); i++) {
-//                        if (time < dataList.get(i).costDay) {
-//                            index = i; // 获取相同日期的索引
-//                            break;
-//                        }
-//                    }
-//                    // 将数据插入到相同日期的最前端
-//                    dataList.add(index, tmpCostMonth);
-//                }
-//            }
             dataList.add(tmpCostMonth);
             addItem(tmpCostMonth);
         }
@@ -520,33 +408,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         if (dataList.size() == 0) {
             dataList.add(costMonth);
         } else {
-//            int index = -1;
-//            for (int i = 0; i < dataList.size(); i++) {
-//                if (time == dataList.get(i).costDay) {
-//                    index = i; // 获取相同日期的索引
-//                    break;
-//                }
-//            }
-//            LogDetails.i("index-" + index);
-//            if (index != -1) {
-//                // 将数据插入到相同日期的最前端
-//                dataList.add(index, costMonth);
-//            } else {
-//                if (time > dataList.get(dataList.size() - 1).costDay) {
-//                    // 新增日期大于表中日期
-//                    dataList.add(costMonth);
-//                } else if (time < dataList.get(dataList.size() - 1).costDay) {
-//                    // 新增日期小于表中日期
-//                    for (int i = 0; i < dataList.size(); i++) {
-//                        if (time < dataList.get(i).costDay) {
-//                            index = i; // 获取表中最小日期索引
-//                            break;
-//                        }
-//                    }
-//                    // 将数据插入到相同日期的最前端
-//                    dataList.add(index, costMonth);
-//                }
-//            }
             dataList.add(costMonth);
         }
         addItem(costMonth);
