@@ -158,10 +158,34 @@
             android:id="@+id/btn_grid"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:background="@drawable/bgbtn2"
             android:singleLine="true"
             android:text="网格"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText"/>
+
+        <Button
+            android:id="@+id/btn_db_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bgbtn2"
+            android:singleLine="true"
+            android:text="备份"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText"/>
+
+        <Button
+            android:id="@+id/btn_db_restore"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bgbtn2"
+            android:singleLine="true"
+            android:text="恢复"
             android:textSize="16sp"
             tools:ignore="HardcodedText"/>
 

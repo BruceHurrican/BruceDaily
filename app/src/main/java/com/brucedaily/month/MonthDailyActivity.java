@@ -50,6 +50,7 @@ import com.brucedaily.database.dao.DaoMaster;
 import com.brucedaily.database.dao.DaoSession;
 import com.bruceutils.base.BaseFragmentActivity;
 import com.bruceutils.utils.LogUtils;
+import com.bruceutils.utils.ProgressDialogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,10 +58,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -91,6 +95,15 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      * 消费价格
      */
     public static final String KEY_COST_PRICE = "costPrice";
+    /**
+     * 备份数据库
+     */
+    public static final String DB_BACKUP = "dbBackup";
+    /**
+     * 恢复数据库
+     */
+    public static final String DB_RESTORE = "dbRestore";
+    public static final String DB_NAME = "md_db";
     @Bind(R.id.tv_title)
     TextView tvTitle;
     @Bind(R.id.btn_add)
@@ -119,6 +132,10 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     Button btnGrid;
     @Bind(R.id.rl_root)
     RelativeLayout rlRoot;
+    @Bind(R.id.btn_db_back)
+    Button btnDbBack;
+    @Bind(R.id.btn_db_restore)
+    Button btnDbRestore;
 
     private List<CostMonth> dataList = new ArrayList<>(31);
     private CostAdapter costAdapter;
@@ -137,8 +154,13 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         setContentView(R.layout.month_activity_daily);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
+        initUIHandler();
+        ProgressDialogUtils.initProgressBar(MonthDailyActivity.this, "操作进行中...", R.mipmap.ic_app);
+        ProgressDialogUtils.showProgressDialog();
+        costAdapter = new CostAdapter();
         initDatabase();
         initData();
+        ProgressDialogUtils.cancelProgressDialog();
 
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvContainer.setLayoutManager(manager);
@@ -146,7 +168,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
 //        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 //        rvContainer.setLayoutManager(staggeredGridLayoutManager);
 
-        costAdapter = new CostAdapter(dataList);
         rvContainer.setAdapter(costAdapter);
 
         costAdapter.setItemClickListener(new CostAdapter.CardViewItemClickListener() {
@@ -174,17 +195,19 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         if (dataList == null) {
             dataList = new ArrayList<>(1);
         }
+        costAdapter.setDataList(dataList);
     }
 
     private void initDatabase() {
-        devOpenHelper = new DaoMaster.DevOpenHelper(this, "md_db", null);
+        devOpenHelper = new DaoMaster.DevOpenHelper(this, DB_NAME, null);
         writableDatabase = devOpenHelper.getWritableDatabase();
         daoMaster = new DaoMaster(writableDatabase);
         daoSession = daoMaster.newSession();
         costMonthDao = daoSession.getCostMonthDao();
     }
 
-    /**mmbw qqwts
+    /**
+     * mmbw qqwts
      * 月消费统计
      */
     private void monthCount() {
@@ -246,6 +269,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
 
     /**
      * 长按每个消费项目操作,当前只支持 “修改” 和 “删除” 操作
+     *
      * @param position
      */
     private void showOperator(final int position) {
@@ -287,6 +311,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     private void refreshData() {
         Collections.sort(dataList);
+        LogDetails.i(dataList);
         costAdapter.notifyDataSetChanged();
         monthCount();
     }
@@ -441,7 +466,47 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         refreshData();
     }
 
-    @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid})
+    /**
+     * 操作数据库
+     *
+     * @param command 备份 {@link #DB_BACKUP}, 支持 {@link #DB_RESTORE}
+     */
+    private void operatorDB(final String command) {
+        ProgressDialogUtils.showProgressDialog();
+        ExecutorService back = Executors.newCachedThreadPool();
+        back.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AppUtils.operatorDBfile(MonthDailyActivity.this, command);
+                    if (command.equals(DB_RESTORE)) {
+                        initData();
+                        getUIHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshData();
+                                showToastShort("恢复数据成功");
+                            }
+                        });
+                    } else {
+                        showToastShort("备份数据成功");
+                    }
+                } catch (IOException e) {
+                    showToastShort("操作失败");
+                    e.printStackTrace();
+                } finally {
+                    getUIHandler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ProgressDialogUtils.cancelProgressDialog();
+                        }
+                    }, 1000);
+                }
+            }
+        });
+    }
+
+    @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid, R.id.btn_db_back, R.id.btn_db_restore})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
@@ -460,6 +525,14 @@ public class MonthDailyActivity extends BaseFragmentActivity {
             case R.id.btn_grid:
                 StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 rvContainer.setLayoutManager(staggeredGridLayoutManager);
+                break;
+            case R.id.btn_db_back:
+                LogDetails.i("备份数据库");
+                operatorDB(DB_BACKUP);
+                break;
+            case R.id.btn_db_restore:
+                LogDetails.i("恢复数据库");
+                operatorDB(DB_RESTORE);
                 break;
         }
     }
@@ -492,6 +565,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         devOpenHelper = null;
         ButterKnife.unbind(this);
         EventBus.getDefault().unregister(this);
+        recycleUIHandler();
         super.onDestroy();
     }
 }
