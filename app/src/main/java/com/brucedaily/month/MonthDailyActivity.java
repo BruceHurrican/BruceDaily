@@ -572,12 +572,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
             LogUtils.d("fragment栈中最上层的 fragment 出栈");
             if (fragmentManager.getBackStackEntryCount() == 0) {
                 LogUtils.i("fragment 栈已经清空");
-                if (Math.abs(exitFlag - System.currentTimeMillis()) < 2000 && exitFlag > 0) {
-                    super.onBackPressed();
-                } else {
-                    showToastShort("再按一次退出应用...");
-                    exitFlag = System.currentTimeMillis();
-                }
             }
             return;
         }
