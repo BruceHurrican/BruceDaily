@@ -53,8 +53,8 @@
             android:textSize="26sp"
             tool:ignore="HardcodedText"/>
 
-        <AutoCompleteTextView
-            android:id="@+id/actw_content"
+        <MultiAutoCompleteTextView
+            android:id="@+id/mactw_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/actw_title"
@@ -74,9 +74,9 @@
             android:id="@+id/ll_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/actw_content"
-            android:layout_alignRight="@id/actw_content"
-            android:layout_below="@id/actw_content"
+            android:layout_alignLeft="@id/mactw_content"
+            android:layout_alignRight="@id/mactw_content"
+            android:layout_below="@id/mactw_content"
             android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
@@ -117,8 +117,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/actw_content"
-            android:layout_alignRight="@id/actw_content"
+            android:layout_alignLeft="@id/mactw_content"
+            android:layout_alignRight="@id/mactw_content"
             android:layout_below="@id/ll_content"
             android:orientation="horizontal">
 

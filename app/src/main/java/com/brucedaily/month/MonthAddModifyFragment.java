@@ -39,6 +39,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.MultiAutoCompleteTextView;
 
 import com.brucedaily.AppUtils;
 import com.brucedaily.R;
@@ -63,8 +64,8 @@ import butterknife.OnFocusChange;
 public class MonthAddModifyFragment extends BaseFragment {
     @Bind(R.id.actw_title)
     AutoCompleteTextView actwTitle;
-    @Bind(R.id.actw_content)
-    AutoCompleteTextView actwContent;
+    @Bind(R.id.mactw_content)
+    MultiAutoCompleteTextView mactwContent;
     @Bind(R.id.actw_time)
     AutoCompleteTextView actwTime;
     @Bind(R.id.et_price)
@@ -99,32 +100,39 @@ public class MonthAddModifyFragment extends BaseFragment {
         isAdd = bundle.getBoolean(MonthDailyActivity.KEY_IS_ADD);
         if (!isAdd) {
             actwTitle.setHint(bundle.getString(MonthDailyActivity.KEY_COST_TITLE));
-            actwContent.setHint(bundle.getString(MonthDailyActivity.KEY_COST_DETAIL));
+            mactwContent.setHint(bundle.getString(MonthDailyActivity.KEY_COST_DETAIL));
             actwTime.setHint(bundle.getString(MonthDailyActivity.KEY_COST_DAY));
             etPrice.setHint(bundle.getString(MonthDailyActivity.KEY_COST_PRICE));
         }
-        initACTWdata(actwTitle, actwContent, actwTime);
+        initACTWdata(actwTitle, mactwContent, actwTime);
+        mactwContent.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
     }
 
-    @OnFocusChange({R.id.actw_title, R.id.actw_content, R.id.actw_time})
+    @OnFocusChange({R.id.actw_title, R.id.mactw_content, R.id.actw_time})
     public void onFocusChange(final View v, boolean hasFocus) {
         switch (v.getId()) {
             case R.id.actw_title:
                 LogDetails.i("title 获取焦点");
+                if (hasFocus) {
+                    ((AutoCompleteTextView) v).showDropDown();
+                }
                 break;
-            case R.id.actw_content:
+            case R.id.mactw_content:
                 LogDetails.i("content 获取焦点");
+                if (hasFocus) {
+                    ((MultiAutoCompleteTextView) v).showDropDown();
+                }
                 break;
             case R.id.actw_time:
                 LogDetails.i("time 获取焦点");
+                if (hasFocus) {
+                    ((AutoCompleteTextView) v).showDropDown();
+                }
                 break;
-        }
-        if (hasFocus) {
-            ((AutoCompleteTextView) v).showDropDown();
         }
     }
 
-    private void initACTWdata(AutoCompleteTextView titleView, AutoCompleteTextView contentView, AutoCompleteTextView timeView) {
+    private void initACTWdata(AutoCompleteTextView titleView, MultiAutoCompleteTextView contentView, AutoCompleteTextView timeView) {
         // 初始化标题候选列表
         List<String> titleList = new ArrayList<>(10);
         titleList.add("早餐");
@@ -151,6 +159,9 @@ public class MonthAddModifyFragment extends BaseFragment {
         contentList.add("微信转账");
         contentList.add("平安卡支出");
         contentList.add("招行卡支出");
+        contentList.add("买水果");
+        contentList.add("买食材");
+        contentList.add("买零食");
         ArrayAdapter<String> contentAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, contentList);
         contentView.setAdapter(contentAdapter);
 
@@ -174,7 +185,7 @@ public class MonthAddModifyFragment extends BaseFragment {
         switch (view.getId()) {
             case R.id.btn_ok:
                 String title = actwTitle.getEditableText().toString().trim();
-                String content = actwContent.getEditableText().toString().trim();
+                String content = mactwContent.getEditableText().toString().trim();
                 String time = actwTime.getEditableText().toString().trim();
                 String price = etPrice.getEditableText().toString().trim();
                 MsgBean msgBean = new MsgBean(isAdd, title, content, time, price);
