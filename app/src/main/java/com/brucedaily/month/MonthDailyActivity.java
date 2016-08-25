@@ -28,6 +28,8 @@ package com.brucedaily.month;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -147,6 +149,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     private DaoMaster daoMaster;
 
     private int position; // 待修改数据位置
+    private FragmentManager fragmentManager;
+    private long exitFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +190,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         });
 
         monthCount();
+
+        fragmentManager = getSupportFragmentManager();
     }
 
     private void initData() {
@@ -338,9 +344,9 @@ public class MonthDailyActivity extends BaseFragmentActivity {
             bundle.putBoolean(KEY_IS_ADD, true);
         }
         monthAddModifyFragment.setArguments(bundle);
-
-        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, monthAddModifyFragment).commit();
-
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.addToBackStack(MonthAddModifyFragment.class.getSimpleName());
+        transaction.replace(android.R.id.content, monthAddModifyFragment).commit();
     }
 
     /**
@@ -556,6 +562,35 @@ public class MonthDailyActivity extends BaseFragmentActivity {
 
     private void deleteAllData() {
         costMonthDao.deleteAll();
+    }
+
+    @Override
+    public void onBackPressed() {
+//        exitFlag = System.currentTimeMillis();
+        // 将入栈的 fragment 按 FILO 规则依次出栈
+        if (fragmentManager.getBackStackEntryCount() > 0 && fragmentManager.popBackStackImmediate(null, 0)) {
+            LogUtils.d("fragment栈中最上层的 fragment 出栈");
+            if (fragmentManager.getBackStackEntryCount() == 0) {
+                LogUtils.i("fragment 栈已经清空");
+                if (Math.abs(exitFlag - System.currentTimeMillis()) < 2000 && exitFlag > 0) {
+                    super.onBackPressed();
+                } else {
+                    showToastShort("再按一次退出应用...");
+                    exitFlag = System.currentTimeMillis();
+                }
+            }
+            return;
+        }
+
+        if (Math.abs(exitFlag - System.currentTimeMillis()) < 2000 && exitFlag > 0) {
+            super.onBackPressed();
+        } else {
+            showToastShort("再按一次退出应用...");
+            exitFlag = System.currentTimeMillis();
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     @Override
