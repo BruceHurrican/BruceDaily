@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -81,6 +82,13 @@ public class MonthAddModifyFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.month_item_add_modify, container, false);
         ButterKnife.bind(this, view);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                LogDetails.i("拦截 fragment 触摸事件生效");
+                return true;
+            }
+        });
         return view;
     }
 
@@ -129,7 +137,8 @@ public class MonthAddModifyFragment extends BaseFragment {
         titleList.add("充手机话费");
         titleList.add("孝敬长辈");
         titleList.add("房东小店");
-        ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, titleList);
+        titleList.add("地铁坐摩的到宿舍");
+        ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, titleList);
         titleView.setAdapter(titleAdapter);
 
         // 初始化内容候选列表
@@ -142,7 +151,7 @@ public class MonthAddModifyFragment extends BaseFragment {
         contentList.add("微信转账");
         contentList.add("平安卡支出");
         contentList.add("招行卡支出");
-        ArrayAdapter<String> contentAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, contentList);
+        ArrayAdapter<String> contentAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, contentList);
         contentView.setAdapter(contentAdapter);
 
         // 初始化时候候选列表
@@ -150,7 +159,7 @@ public class MonthAddModifyFragment extends BaseFragment {
         for (byte i = 1; i <= 31; i++) {
             timeList.add(i);
         }
-        ArrayAdapter<Byte> timeAdapter = new ArrayAdapter<Byte>(getActivity(), android.R.layout.simple_spinner_item, timeList);
+        ArrayAdapter<Byte> timeAdapter = new ArrayAdapter<Byte>(getActivity(), R.layout.month_data_item, timeList);
         timeView.setAdapter(timeAdapter);
     }
 
@@ -192,6 +201,10 @@ public class MonthAddModifyFragment extends BaseFragment {
                     LogDetails.w("数据未做任何修改");
                     showToastShort("亲,未修改任何信息喔~");
                 } else {
+                    if (TextUtils.isEmpty(price)) {
+                        price = etPrice.getHint().toString().trim();
+                        msgBean.price = price;
+                    }
                     LogUtils.i("修改数据");
                     EventBus.getDefault().post(msgBean);
                 }
