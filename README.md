@@ -1,5 +1,8 @@
 # BruceDaily
 used for bruce recording daily tips.
+Simple is good for user.
+
+追求极致简约,简简单单,方便用户.
 
 #todo
 - 增加 GreenDao done
@@ -8,3 +11,4 @@ used for bruce recording daily tips.
 - 代码扫描
 - 增加内存泄漏检测和 UI 卡顿检测
 - 增加数据库本地备份和恢复功能 done
+- 增加加密算法加密本地数据库
