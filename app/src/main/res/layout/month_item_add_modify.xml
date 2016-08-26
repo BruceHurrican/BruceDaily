@@ -28,13 +28,9 @@
                 xmlns:tool="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#8000">
+                android:background="#8000"
+                android:paddingTop="5dp">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="5dp">
 
         <AutoCompleteTextView
             android:id="@+id/actw_title"
@@ -147,5 +143,4 @@
                 tool:ignore="HardcodedText"/>
 
         </LinearLayout>
-    </RelativeLayout>
 </RelativeLayout>

@@ -66,8 +66,7 @@ public class CostAdapter extends RecyclerView.Adapter<CostAdapter.CostViewHolder
     @Override
     public CostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.month_item, parent, false);
-        CostViewHolder costViewHolder = new CostViewHolder(view);
-        return costViewHolder;
+        return new CostViewHolder(view);
     }
 
     @Override

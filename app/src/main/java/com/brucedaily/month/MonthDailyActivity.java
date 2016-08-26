@@ -218,7 +218,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     private void monthCount() {
         float total = 4500;
-        List<CostMonth> tmpList = null;
+        List<CostMonth> tmpList;
         // 上旬花费
         float monthEarly = 0;
         tmpList = costMonthDao.queryBuilder().where(CostMonthDao.Properties.CostDay.between(1, 10)).list();
@@ -280,7 +280,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     private void showOperator(final int position) {
         LogDetails.i("position-" + position);
-        View view = getLayoutInflater().inflate(R.layout.month_item_detail, null);
+        View view = getLayoutInflater().inflate(R.layout.month_item_detail, rlRoot);
         TextView tvModify = (TextView) view.findViewById(R.id.tv_title);
         TextView tvDelete = (TextView) view.findViewById(R.id.tv_detail);
         tvModify.setText("修改");
@@ -362,11 +362,11 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     private boolean modifyCostRecord(int position, String title, String content, String tmpTime, String price) {
         CostMonth costMonth = dataList.get(position);
         if (!AppUtils.isPriceValid(price)) {
-            LogUtils.e("输入的价格不符合格式规范");
-            showToastShort("输入的价格不符合格式规范");
+            LogUtils.e(getString(R.string.md_price_invalid));
+            showToastShort(getString(R.string.md_price_invalid));
             return false;
         }
-        int time = 0;
+        int time;
         if (!TextUtils.isEmpty(title)) {
             costMonth.costTitle = title;
         }
@@ -419,8 +419,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
             return false;
         }
         if (!AppUtils.isPriceValid(price)) {
-            LogUtils.e("输入的价格不符合格式规范");
-            showToastShort("输入的价格不符合格式规范");
+            LogUtils.e(getString(R.string.md_price_invalid));
+            showToastShort(getString(R.string.md_price_invalid));
             return false;
         }
         int time = Integer.valueOf(tmpTime);
