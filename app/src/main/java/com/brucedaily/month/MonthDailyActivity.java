@@ -213,7 +213,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     }
 
     /**
-     * mmbw qqwts
      * 月消费统计
      */
     private void monthCount() {
