@@ -25,45 +25,52 @@
 
 package com.brucedaily;
 
-import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
-import com.bruceutils.base.BaseApplication;
-import com.bruceutils.utils.logdetails.LogDetails;
-import com.github.moduth.blockcanary.BlockCanary;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
+import com.bruceutils.utils.LogUtils;
+import com.github.moduth.blockcanary.BlockCanaryContext;
 
 /**
- * app application
- * Created by BruceHurrican on 2016/7/24.
+ * Created by BruceHurrican on 2016/3/1.
  */
-public class DailyApplication extends BaseApplication {
-    private static Context sContext;
-    private RefWatcher refWatcher;
+public class BDBlockCanaryContext extends BlockCanaryContext {
+    String qualifier = "DemoBlock";
 
-    public static RefWatcher getRefWatcher(Context context) {
-        DailyApplication application = (DailyApplication) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    public static Context getAppContext() {
-        return sContext;
+    @Override
+    public String getQualifier() {
+        try {
+            PackageInfo info = DailyApplication.getAppContext().getPackageManager().getPackageInfo(DailyApplication.getAppContext().getPackageName(), 0);
+            qualifier += info.versionCode + "_" + info.versionName + "_Bruce";
+        } catch (PackageManager.NameNotFoundException e) {
+            LogUtils.e(e.toString());
+        }
+        return qualifier;
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        LogDetails.getLogConfig().configShowBorders(true);
-        if (Constants.IS_OPEN_UI_BLOCK_CANARY) {
-            sContext = this;
-            BlockCanary.install(this, new BDBlockCanaryContext()).start();
-        }
-        if (Constants.IS_OPEN_LEAK_CANARY) {
-            refWatcher = initLeakCanary();
-        }
+    public String getUid() {
+        return Build.SERIAL;
     }
 
-    private RefWatcher initLeakCanary() {
-        return Constants.ISDEBUG ? LeakCanary.install(this) : RefWatcher.DISABLED;
+    @Override
+    public String getNetworkType() {
+        return "4G";
+    }
+
+    @Override
+    public int getConfigDuration() {
+        return 9999;
+    }
+
+    @Override
+    public int getConfigBlockThreshold() {
+        return 500;
+    }
+
+    @Override
+    public boolean isNeedDisplay() {
+        return BuildConfig.DEBUG;
     }
 }

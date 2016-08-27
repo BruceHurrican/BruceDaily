@@ -43,7 +43,7 @@ import android.widget.MultiAutoCompleteTextView;
 
 import com.brucedaily.AppUtils;
 import com.brucedaily.R;
-import com.bruceutils.base.BaseFragment;
+import com.brucedaily.base.BDFragment;
 import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
 
@@ -61,7 +61,7 @@ import butterknife.OnFocusChange;
  * 增加 修改界面
  * Created by BruceHurrican on 16/8/22.
  */
-public class MonthAddModifyFragment extends BaseFragment {
+public class MonthAddModifyFragment extends BDFragment {
     @Bind(R.id.actw_title)
     AutoCompleteTextView actwTitle;
     @Bind(R.id.mactw_content)

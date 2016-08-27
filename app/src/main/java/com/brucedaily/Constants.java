@@ -25,45 +25,18 @@
 
 package com.brucedaily;
 
-import android.content.Context;
-
-import com.bruceutils.base.BaseApplication;
-import com.bruceutils.utils.logdetails.LogDetails;
-import com.github.moduth.blockcanary.BlockCanary;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
-
 /**
- * app application
- * Created by BruceHurrican on 2016/7/24.
+ * Created by BruceHurrican on 16/8/27.
  */
-public class DailyApplication extends BaseApplication {
-    private static Context sContext;
-    private RefWatcher refWatcher;
+public class Constants {
+    public static final boolean ISDEBUG = true; // 日志开关
 
-    public static RefWatcher getRefWatcher(Context context) {
-        DailyApplication application = (DailyApplication) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    public static Context getAppContext() {
-        return sContext;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        LogDetails.getLogConfig().configShowBorders(true);
-        if (Constants.IS_OPEN_UI_BLOCK_CANARY) {
-            sContext = this;
-            BlockCanary.install(this, new BDBlockCanaryContext()).start();
-        }
-        if (Constants.IS_OPEN_LEAK_CANARY) {
-            refWatcher = initLeakCanary();
-        }
-    }
-
-    private RefWatcher initLeakCanary() {
-        return Constants.ISDEBUG ? LeakCanary.install(this) : RefWatcher.DISABLED;
-    }
+    /**
+     * 是否打开内存泄漏监控
+     */
+    public static final boolean IS_OPEN_LEAK_CANARY = true;
+    /**
+     * 是否打开UI卡顿监控
+     */
+    public static final boolean IS_OPEN_UI_BLOCK_CANARY = true;
 }

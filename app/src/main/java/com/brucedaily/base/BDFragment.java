@@ -23,47 +23,22 @@
  *     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
-package com.brucedaily;
+package com.brucedaily.base;
 
-import android.content.Context;
-
-import com.bruceutils.base.BaseApplication;
-import com.bruceutils.utils.logdetails.LogDetails;
-import com.github.moduth.blockcanary.BlockCanary;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
+import com.brucedaily.Constants;
+import com.brucedaily.DailyApplication;
+import com.bruceutils.base.BaseFragment;
 
 /**
- * app application
- * Created by BruceHurrican on 2016/7/24.
+ * Created by BruceHurrican on 16/8/27.
  */
-public class DailyApplication extends BaseApplication {
-    private static Context sContext;
-    private RefWatcher refWatcher;
-
-    public static RefWatcher getRefWatcher(Context context) {
-        DailyApplication application = (DailyApplication) context.getApplicationContext();
-        return application.refWatcher;
-    }
-
-    public static Context getAppContext() {
-        return sContext;
-    }
-
+public class BDFragment extends BaseFragment {
     @Override
-    public void onCreate() {
-        super.onCreate();
-        LogDetails.getLogConfig().configShowBorders(true);
-        if (Constants.IS_OPEN_UI_BLOCK_CANARY) {
-            sContext = this;
-            BlockCanary.install(this, new BDBlockCanaryContext()).start();
-        }
+    public void onDestroy() {
+        super.onDestroy();
+        // 监控 fragment 是否存在 memory leak
         if (Constants.IS_OPEN_LEAK_CANARY) {
-            refWatcher = initLeakCanary();
+            DailyApplication.getRefWatcher(getActivity()).watch(this);
         }
-    }
-
-    private RefWatcher initLeakCanary() {
-        return Constants.ISDEBUG ? LeakCanary.install(this) : RefWatcher.DISABLED;
     }
 }

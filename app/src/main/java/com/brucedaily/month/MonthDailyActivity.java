@@ -279,7 +279,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     private void showOperator(final int position) {
         LogDetails.i("position-" + position);
-        View view = getLayoutInflater().inflate(R.layout.month_item_detail, rlRoot);
+        View view = getLayoutInflater().inflate(R.layout.month_item_detail, null);
         TextView tvModify = (TextView) view.findViewById(R.id.tv_title);
         TextView tvDelete = (TextView) view.findViewById(R.id.tv_detail);
         tvModify.setText("修改");
