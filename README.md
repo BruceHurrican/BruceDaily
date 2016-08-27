@@ -19,3 +19,7 @@ Simple is good for user.
 - 增加内存泄漏检测和 UI 卡顿检测 done
 - 增加数据库本地备份和恢复功能 done
 - 增加加密算法加密本地数据库
+- 压缩示例 gif 大小
+ 
+##示例
+![alt text](https://github.com/BruceHurrican/BruceDaily/blob/master/video/showcase.gif)
