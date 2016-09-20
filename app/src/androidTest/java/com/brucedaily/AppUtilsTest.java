@@ -27,6 +27,11 @@ package com.brucedaily;
 
 //import org.junit.Assert;
 
+import android.util.Log;
+
+import com.bruceutils.utils.LogUtils;
+import com.bruceutils.utils.logdetails.LogDetails;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -48,6 +53,9 @@ public class AppUtilsTest extends TestCase {
     //    @org.junit.Test
     public void testFloat2StringPrice() throws Exception {
         Assert.assertEquals("33", AppUtils.float2StringPrice(33f));
+        Log.i("安卓单元测试", "testFloat2StringPrice 方法执行成功");
+        LogDetails.i("安卓单元测试");
+        LogUtils.i("安卓单元测试2");
     }
 
     //    @org.junit.Test
