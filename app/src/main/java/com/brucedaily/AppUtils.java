@@ -27,6 +27,7 @@ package com.brucedaily;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.brucedaily.month.MonthDailyActivity;
@@ -149,5 +150,25 @@ public class AppUtils {
                 }
             }
         }
+    }
+
+    // 单元测试使用 打印日志
+    public static int addResult(int a, int b, boolean isTest) {
+        if (isTest) {
+            System.out.println("a+b= " + (a + b));
+        } else {
+            LogUtils.i("a+b= " + (a + b));
+        }
+        return a + b;
+    }
+
+    /**
+     * robolectric 单元测试
+     *
+     * @param info 单元测试提示信息
+     * @return
+     */
+    public static String robolectricTestInfo(@NonNull String info) {
+        return Constants.BRUCE_TEST.equals(BuildConfig.FLAVOR) ? info : "非单元测试阶段";
     }
 }

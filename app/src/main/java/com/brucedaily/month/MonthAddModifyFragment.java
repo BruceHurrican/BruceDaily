@@ -62,6 +62,8 @@ import butterknife.OnFocusChange;
  * Created by BruceHurrican on 16/8/22.
  */
 public class MonthAddModifyFragment extends BDFragment {
+    // robolectric test
+    public String testInfo;
     @Bind(R.id.actw_title)
     AutoCompleteTextView actwTitle;
     @Bind(R.id.mactw_content)
@@ -97,7 +99,7 @@ public class MonthAddModifyFragment extends BDFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
-        isAdd = bundle.getBoolean(MonthDailyActivity.KEY_IS_ADD);
+        isAdd = null == bundle || bundle.getBoolean(MonthDailyActivity.KEY_IS_ADD);
         if (!isAdd) {
             actwTitle.setHint(bundle.getString(MonthDailyActivity.KEY_COST_TITLE));
             mactwContent.setHint(bundle.getString(MonthDailyActivity.KEY_COST_DETAIL));
@@ -106,6 +108,8 @@ public class MonthAddModifyFragment extends BDFragment {
         }
         initACTWdata(actwTitle, mactwContent, actwTime);
         mactwContent.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        // robolectric test
+        testInfo = AppUtils.robolectricTestInfo("onViewCreated");
     }
 
     @OnFocusChange({R.id.actw_title, R.id.mactw_content, R.id.actw_time})

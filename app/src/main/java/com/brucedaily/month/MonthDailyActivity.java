@@ -106,6 +106,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     public static final String DB_RESTORE = "dbRestore";
     public static final String DB_NAME = "md_db";
+    // robolectric test
+    public String testTagInfo;
     @Bind(R.id.tv_title)
     TextView tvTitle;
     @Bind(R.id.btn_add)
@@ -138,7 +140,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     Button btnDbBack;
     @Bind(R.id.btn_db_restore)
     Button btnDbRestore;
-
     private List<CostMonth> dataList = new ArrayList<>(31);
     private CostAdapter costAdapter;
     // 数据库相关
@@ -147,7 +148,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     private CostMonthDao costMonthDao;
     private DaoSession daoSession;
     private DaoMaster daoMaster;
-
     private int position; // 待修改数据位置
     private FragmentManager fragmentManager;
     private long exitFlag;
@@ -192,6 +192,9 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         monthCount();
 
         fragmentManager = getSupportFragmentManager();
+
+        // robolectric test
+        testTagInfo = AppUtils.robolectricTestInfo("onCreate");
     }
 
     private void initData() {
@@ -346,6 +349,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.addToBackStack(MonthAddModifyFragment.class.getSimpleName());
         transaction.replace(android.R.id.content, monthAddModifyFragment).commit();
+        // robolectric test
+        testTagInfo = AppUtils.robolectricTestInfo("operateCostRecord executed");
     }
 
     /**
@@ -594,6 +599,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         ButterKnife.unbind(this);
         EventBus.getDefault().unregister(this);
         recycleUIHandler();
+        // robolectric test
+        testTagInfo = AppUtils.robolectricTestInfo("onDestroy");
         super.onDestroy();
     }
 }
