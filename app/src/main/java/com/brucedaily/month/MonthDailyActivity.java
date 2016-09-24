@@ -25,11 +25,11 @@
 
 package com.brucedaily.month;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -50,7 +50,7 @@ import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.database.dao.CostMonthDao;
 import com.brucedaily.database.dao.DaoMaster;
 import com.brucedaily.database.dao.DaoSession;
-import com.bruceutils.base.BaseFragmentActivity;
+import com.bruceutils.base.BaseActivity;
 import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.ProgressDialogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
@@ -76,7 +76,7 @@ import butterknife.OnClick;
  * 按月统计消费金额
  * Created by BruceHurrican on 2016/7/24.
  */
-public class MonthDailyActivity extends BaseFragmentActivity {
+public class MonthDailyActivity extends BaseActivity {
     /**
      * 是否是添加数据
      */
@@ -191,7 +191,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
 
         monthCount();
 
-        fragmentManager = getSupportFragmentManager();
+        fragmentManager = getFragmentManager();
 
         // robolectric test
         testTagInfo = AppUtils.robolectricTestInfo("onCreate");

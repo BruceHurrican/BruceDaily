@@ -60,8 +60,6 @@ public class AppUtils {
      * @return
      */
     public static String float2StringPrice(float price) {
-        LogDetails.i("安卓单元测试");
-        LogUtils.i("安卓单元测试2");
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setMaximumFractionDigits(2);
         return format.format(price);
