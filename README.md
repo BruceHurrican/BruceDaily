@@ -16,6 +16,7 @@ Simple is good for user.
 - 重构代码 MVC to MVP
 - 增加加密算法加密本地数据库
 - 压缩示例 gif 大小
+- 更新弹窗 UI，增加 support design 包 将 edittext 修改为 TextInputLayout[参考](http://blog.csdn.net/eclipsexys/article/details/46349721)
 
 1.0版本需求
 

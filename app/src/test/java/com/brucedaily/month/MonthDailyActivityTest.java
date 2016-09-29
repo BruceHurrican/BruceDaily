@@ -40,9 +40,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowToast;
-import org.robolectric.shadows.support.v4.SupportFragmentController;
-import org.robolectric.shadows.support.v4.SupportFragmentTestUtil;
 import org.robolectric.util.ActivityController;
+import org.robolectric.util.FragmentController;
+import org.robolectric.util.FragmentTestUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -88,8 +88,8 @@ public class MonthDailyActivityTest {
     @Test
     public void testMonthAddModifyFragment() throws Exception {
         MonthAddModifyFragment fragment = new MonthAddModifyFragment();
-        SupportFragmentController<MonthAddModifyFragment> fragmentController = SupportFragmentController.of(fragment);
-        SupportFragmentTestUtil.startFragment(fragment);
+        FragmentController<MonthAddModifyFragment> fragmentController = FragmentController.of(fragment);
+        FragmentTestUtil.startFragment(fragment);
 //        assertEquals("onCreateView", fragment.testInfo);
         assertEquals("onViewCreated", fragment.testInfo);
         assertNotNull(fragment.getView());
