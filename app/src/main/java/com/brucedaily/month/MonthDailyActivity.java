@@ -30,6 +30,7 @@ import android.app.FragmentTransaction;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -151,6 +152,7 @@ public class MonthDailyActivity extends BaseActivity {
     private int position; // 待修改数据位置
     private FragmentManager fragmentManager;
     private long exitFlag;
+    private DefaultItemAnimator defaultItemAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +170,9 @@ public class MonthDailyActivity extends BaseActivity {
 
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvContainer.setLayoutManager(manager);
+
+        defaultItemAnimator = new DefaultItemAnimator();
+        rvContainer.setItemAnimator(defaultItemAnimator);
 
 //        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 //        rvContainer.setLayoutManager(staggeredGridLayoutManager);
@@ -531,10 +536,12 @@ public class MonthDailyActivity extends BaseActivity {
             case R.id.btn_list:
                 LinearLayoutManager manager = new LinearLayoutManager(MonthDailyActivity.this, LinearLayoutManager.VERTICAL, false);
                 rvContainer.setLayoutManager(manager);
+                rvContainer.setItemAnimator(defaultItemAnimator);
                 break;
             case R.id.btn_grid:
                 StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                 rvContainer.setLayoutManager(staggeredGridLayoutManager);
+                rvContainer.setItemAnimator(defaultItemAnimator);
                 break;
             case R.id.btn_db_back:
                 LogDetails.i("备份数据库");
