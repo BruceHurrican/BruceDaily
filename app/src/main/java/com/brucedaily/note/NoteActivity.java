@@ -66,7 +66,7 @@ import butterknife.OnClick;
 
 /**
  * 按月统计消费金额
- * Created by BruceHurrican on 2016/7/24.
+ * Created by BruceHurrican on 2016/10/27.
  */
 public class NoteActivity extends BaseActivity {
     /**

@@ -13,7 +13,7 @@ Simple is good for user.
 1.5版本需求
 
 - 增加单元测试框架 Robolectric done
-- 重构代码 MVC to MVP
+- 重构代码 MVC to MVP done
 - 增加加密算法加密本地数据库
 - 压缩示例 gif 大小
 - 更新弹窗 UI，增加 support design 包 将 edittext 修改为 TextInputLayout[参考](http://blog.csdn.net/eclipsexys/article/details/46349721)
