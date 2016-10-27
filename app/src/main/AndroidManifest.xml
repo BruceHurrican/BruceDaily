@@ -47,6 +47,12 @@
             android:name=".month.MonthDailyActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
+
+        </activity>
+        <activity
+            android:name=".note.NoteActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
