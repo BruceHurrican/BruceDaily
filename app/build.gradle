@@ -24,7 +24,7 @@
  */
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.antfortune.freeline'
+//apply plugin: 'com.antfortune.freeline'
 
 android {
     compileSdkVersion 23
@@ -43,10 +43,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    freeline {
-        hack true
-        productFlavor 'develop'
-    }
+//    freeline {
+//        hack true
+//        productFlavor 'develop'
+//    }
     productFlavors {
         bruceTest {
             targetSdkVersion 21

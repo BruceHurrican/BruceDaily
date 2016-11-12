@@ -1,1 +1,1 @@
-include ':app', ':bruceutils'
+include ':app', ':bruceutils', ':fldemo'
