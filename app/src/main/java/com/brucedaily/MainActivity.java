@@ -43,11 +43,7 @@ import com.bruceutils.utils.logdetails.LogDetails;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final String SP_KEY_BDAILY_1 = "bdaily1";
     public static final String SP_KEY_BDAILY_2 = "bdaily2";
     public static final String SP_KEY_BDAILY_3 = "bdaily3";
@@ -55,31 +51,18 @@ public class MainActivity extends BaseActivity {
     public static final String SP_KEY_BDAILY_5 = "bdaily5";
     public static final String SP_KEY_BDAILY_6 = "bdaily6";
     public static final String SP_KEY_BDAILY_7 = "bdaily7";
-    @Bind(R.id.et_item)
     EditText etItem;
-    @Bind(R.id.btn_add)
     Button btnAdd;
-    @Bind(R.id.btn_clear)
     Button btnClear;
-    @Bind(R.id.lv_data)
     ListView lvData;
-    @Bind(R.id.rbtn_1)
     RadioButton rbtn1;
-    @Bind(R.id.rbtn_2)
     RadioButton rbtn2;
-    @Bind(R.id.rbtn_3)
     RadioButton rbtn3;
-    @Bind(R.id.rbtn_4)
     RadioButton rbtn4;
-    @Bind(R.id.rbtn_5)
     RadioButton rbtn5;
-    @Bind(R.id.rbtn_6)
     RadioButton rbtn6;
-    @Bind(R.id.rbtn_7)
     RadioButton rbtn7;
-    @Bind(R.id.radio_group)
     RadioGroup radioGroup;
-    @Bind(R.id.btn_modify)
     Button btnModify;
 
     private String customItem = "";
@@ -92,7 +75,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        initView();
         initData();
         customItem = SharedPreferencesUtil.getString(MainActivity.this, keys[flag], "");
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -124,6 +107,26 @@ public class MainActivity extends BaseActivity {
                 customItem = SharedPreferencesUtil.getString(MainActivity.this, keys[flag], "");
             }
         });
+    }
+
+    private void initView() {
+        etItem = (EditText) findViewById(R.id.et_item);
+        btnAdd = (Button) findViewById(R.id.btn_add);
+        btnModify = (Button) findViewById(R.id.btn_modify);
+        btnClear = (Button) findViewById(R.id.btn_clear);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        rbtn1 = (RadioButton) findViewById(R.id.rbtn_1);
+        rbtn2 = (RadioButton) findViewById(R.id.rbtn_2);
+        rbtn3 = (RadioButton) findViewById(R.id.rbtn_3);
+        rbtn4 = (RadioButton) findViewById(R.id.rbtn_4);
+        rbtn5 = (RadioButton) findViewById(R.id.rbtn_5);
+        rbtn6 = (RadioButton) findViewById(R.id.rbtn_6);
+        rbtn7 = (RadioButton) findViewById(R.id.rbtn_7);
+        lvData = (ListView) findViewById(R.id.lv_data);
+
+        btnAdd.setOnClickListener(this);
+        btnModify.setOnClickListener(this);
+        btnClear.setOnClickListener(this);
     }
 
     private void initData() {
@@ -158,7 +161,6 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_modify})
     public void onClick(View view) {
         String tmp = etItem.getText().toString().trim();
         switch (view.getId()) {
@@ -214,6 +216,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
     }
 }

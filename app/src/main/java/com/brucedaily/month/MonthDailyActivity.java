@@ -1,26 +1,26 @@
 /*
  * BruceHurrican
- *  Copyright (c) 2016.
- *     Licensed under the Apache License, Version 2.0 (the "License");
- *     you may not use this file except in compliance with the License.
- *     You may obtain a copy of the License at
+ * Copyright (c) 2016.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- *     Unless required by applicable law or agreed to in writing, software
- *     distributed under the License is distributed on an "AS IS" BASIS,
- *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *     See the License for the specific language governing permissions and
- *     limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  *
- *     This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
- *     And where any person can download and use, but not for commercial purposes.
- *     Author does not assume the resulting corresponding disputes.
- *     If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
- *     本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
- *     任和何人可以下载并使用, 但是不能用于商业用途。
- *     作者不承担由此带来的相应纠纷。
- *     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
+ *    This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
+ *    And where any person can download and use, but not for commercial purposes.
+ *    Author does not assume the resulting corresponding disputes.
+ *    If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
+ *    本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
+ *    任和何人可以下载并使用, 但是不能用于商业用途。
+ *    作者不承担由此带来的相应纠纷。
+ *    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
 package com.brucedaily.month;
@@ -68,15 +68,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * 按月统计消费金额
  * Created by BruceHurrican on 2016/7/24.
  */
-public class MonthDailyActivity extends BaseFragmentActivity {
+public class MonthDailyActivity extends BaseFragmentActivity implements View.OnClickListener {
     /**
      * 是否是添加数据
      */
@@ -106,37 +103,21 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      */
     public static final String DB_RESTORE = "dbRestore";
     public static final String DB_NAME = "md_db";
-    @Bind(R.id.tv_title)
     TextView tvTitle;
-    @Bind(R.id.btn_add)
     Button btnAdd;
-    @Bind(R.id.btn_clear)
     Button btnClear;
-    @Bind(R.id.tv_total)
     TextView tvTotal;
-    @Bind(R.id.tv_remain)
     TextView tvRemain;
-    @Bind(R.id.tv_count_early)
     TextView tvCountEarly;
-    @Bind(R.id.tv_count_middle)
     TextView tvCountMiddle;
-    @Bind(R.id.tv_count_last)
     TextView tvCountLast;
-    @Bind(R.id.ll_container)
     LinearLayout llContainer;
-    @Bind(R.id.tv_rv_type)
     LinearLayout tvRvTitle;
-    @Bind(R.id.rv_container)
     RecyclerView rvContainer;
-    @Bind(R.id.btn_list)
     Button btnList;
-    @Bind(R.id.btn_grid)
     Button btnGrid;
-    @Bind(R.id.rl_root)
     RelativeLayout rlRoot;
-    @Bind(R.id.btn_db_back)
     Button btnDbBack;
-    @Bind(R.id.btn_db_restore)
     Button btnDbRestore;
 
     private List<CostMonth> dataList = new ArrayList<>(31);
@@ -156,8 +137,8 @@ public class MonthDailyActivity extends BaseFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.month_activity_daily);
-        ButterKnife.bind(this);
         EventBus.getDefault().register(this);
+        initView();
         initUIHandler();
         ProgressDialogUtils.initProgressBar(MonthDailyActivity.this, "操作进行中...", R.mipmap.ic_app);
         ProgressDialogUtils.showProgressDialog();
@@ -194,6 +175,31 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         fragmentManager = getSupportFragmentManager();
     }
 
+    private void initView() {
+        rlRoot = (RelativeLayout) findViewById(R.id.rl_root);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
+        btnAdd = (Button) findViewById(R.id.btn_add);
+        btnClear = (Button) findViewById(R.id.btn_clear);
+        llContainer = (LinearLayout) findViewById(R.id.ll_container);
+        tvTotal = (TextView) findViewById(R.id.tv_total);
+        tvRemain = (TextView) findViewById(R.id.tv_remain);
+        tvCountEarly = (TextView) findViewById(R.id.tv_count_early);
+        tvCountMiddle = (TextView) findViewById(R.id.tv_count_middle);
+        tvCountLast = (TextView) findViewById(R.id.tv_count_last);
+        btnList = (Button) findViewById(R.id.btn_list);
+        btnGrid = (Button) findViewById(R.id.btn_grid);
+        btnDbBack = (Button) findViewById(R.id.btn_db_back);
+        btnDbRestore = (Button) findViewById(R.id.btn_db_restore);
+        rvContainer = (RecyclerView) findViewById(R.id.rv_container);
+
+        btnAdd.setOnClickListener(this);
+        btnClear.setOnClickListener(this);
+        btnList.setOnClickListener(this);
+        btnGrid.setOnClickListener(this);
+        btnDbBack.setOnClickListener(this);
+        btnDbRestore.setOnClickListener(this);
+    }
+
     private void initData() {
         // 查询结果集按日期降序排序，如果日期相同则按id降序排序
         dataList = costMonthDao.queryBuilder().orderDesc(CostMonthDao.Properties.CostDay).orderDesc(CostMonthDao.Properties.CostModifyDate).list();
@@ -216,7 +222,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
      * 月消费统计
      */
     private void monthCount() {
-        float total = 4500;
+        float total = 6000;
         List<CostMonth> tmpList;
         // 上旬花费
         float monthEarly = 0;
@@ -511,7 +517,6 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         });
     }
 
-    @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid, R.id.btn_db_back, R.id.btn_db_restore})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
@@ -591,7 +596,7 @@ public class MonthDailyActivity extends BaseFragmentActivity {
         daoSession = null;
         devOpenHelper.close();
         devOpenHelper = null;
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
         EventBus.getDefault().unregister(this);
         recycleUIHandler();
         super.onDestroy();

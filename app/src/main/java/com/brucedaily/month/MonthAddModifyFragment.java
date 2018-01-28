@@ -1,26 +1,26 @@
 /*
  * BruceHurrican
- *  Copyright (c) 2016.
- *     Licensed under the Apache License, Version 2.0 (the "License");
- *     you may not use this file except in compliance with the License.
- *     You may obtain a copy of the License at
+ * Copyright (c) 2016.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- *     Unless required by applicable law or agreed to in writing, software
- *     distributed under the License is distributed on an "AS IS" BASIS,
- *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *     See the License for the specific language governing permissions and
- *     limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  *
- *     This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
- *     And where any person can download and use, but not for commercial purposes.
- *     Author does not assume the resulting corresponding disputes.
- *     If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
- *     本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
- *     任和何人可以下载并使用, 但是不能用于商业用途。
- *     作者不承担由此带来的相应纠纷。
- *     如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
+ *    This document is Bruce's individual learning the android demo, wherein the use of the code from the Internet, only to use as a learning exchanges.
+ *    And where any person can download and use, but not for commercial purposes.
+ *    Author does not assume the resulting corresponding disputes.
+ *    If you have good suggestions for the code, you can contact BurrceHurrican@foxmail.com
+ *    本文件为Bruce's个人学习android的作品, 其中所用到的代码来源于互联网，仅作为学习交流使用。
+ *    任和何人可以下载并使用, 但是不能用于商业用途。
+ *    作者不承担由此带来的相应纠纷。
+ *    如果对本代码有好的建议，可以联系BurrceHurrican@foxmail.com
  */
 
 package com.brucedaily.month;
@@ -52,29 +52,17 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnFocusChange;
-
 /**
  * 增加 修改界面
  * Created by BruceHurrican on 16/8/22.
  */
-public class MonthAddModifyFragment extends BDFragment {
-    @Bind(R.id.actw_title)
+public class MonthAddModifyFragment extends BDFragment implements View.OnClickListener, View.OnFocusChangeListener {
     AutoCompleteTextView actwTitle;
-    @Bind(R.id.mactw_content)
     MultiAutoCompleteTextView mactwContent;
-    @Bind(R.id.actw_time)
     AutoCompleteTextView actwTime;
-    @Bind(R.id.et_price)
     EditText etPrice;
-    @Bind(R.id.ll_content)
     LinearLayout llContent;
-    @Bind(R.id.btn_ok)
     Button btnOk;
-    @Bind(R.id.btn_cancel)
     Button btnCancel;
     private boolean isAdd;
 
@@ -82,7 +70,6 @@ public class MonthAddModifyFragment extends BDFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.month_item_add_modify, container, false);
-        ButterKnife.bind(this, view);
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -90,6 +77,22 @@ public class MonthAddModifyFragment extends BDFragment {
                 return true;
             }
         });
+
+        actwTitle = (AutoCompleteTextView) view.findViewById(R.id.actw_title);
+        mactwContent = (MultiAutoCompleteTextView) view.findViewById(R.id.mactw_content);
+        llContent = (LinearLayout) view.findViewById(R.id.ll_content);
+        actwTime = (AutoCompleteTextView) view.findViewById(R.id.actw_time);
+        etPrice = (EditText) view.findViewById(R.id.et_price);
+        btnOk = (Button) view.findViewById(R.id.btn_ok);
+        btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+
+        actwTitle.setOnFocusChangeListener(this);
+        actwTime.setOnFocusChangeListener(this);
+        mactwContent.setOnFocusChangeListener(this);
+
+        btnOk.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+
         return view;
     }
 
@@ -108,7 +111,6 @@ public class MonthAddModifyFragment extends BDFragment {
         mactwContent.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
     }
 
-    @OnFocusChange({R.id.actw_title, R.id.mactw_content, R.id.actw_time})
     public void onFocusChange(final View v, boolean hasFocus) {
         switch (v.getId()) {
             case R.id.actw_title:
@@ -145,6 +147,7 @@ public class MonthAddModifyFragment extends BDFragment {
         titleList.add("充手机话费");
         titleList.add("孝敬长辈");
         titleList.add("房东小店");
+        titleList.add("加班打车");
         titleList.add("地铁坐摩的到宿舍");
         ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, titleList);
         titleView.setAdapter(titleAdapter);
@@ -160,6 +163,7 @@ public class MonthAddModifyFragment extends BDFragment {
         contentList.add("平安卡支出");
         contentList.add("招行卡支出");
         contentList.add("买水果");
+        contentList.add("买面包");
         contentList.add("买食材");
         contentList.add("买零食");
         ArrayAdapter<String> contentAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, contentList);
@@ -177,10 +181,9 @@ public class MonthAddModifyFragment extends BDFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.btn_ok, R.id.btn_cancel})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_ok:
