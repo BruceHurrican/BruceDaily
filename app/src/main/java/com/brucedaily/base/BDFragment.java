@@ -25,6 +25,7 @@
 
 package com.brucedaily.base;
 
+import com.brucedaily.BuildConfig;
 import com.brucedaily.Constants;
 import com.brucedaily.DailyApplication;
 import com.bruceutils.base.BaseFragment;
@@ -37,7 +38,7 @@ public class BDFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         // 监控 fragment 是否存在 memory leak
-        if (Constants.IS_OPEN_LEAK_CANARY) {
+        if (Constants.IS_OPEN_LEAK_CANARY && !Constants.BRUCE_TEST.equals(BuildConfig.FLAVOR)) {
             DailyApplication.getRefWatcher(getActivity()).watch(this);
         }
     }

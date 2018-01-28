@@ -58,7 +58,7 @@ public class DailyApplication extends BaseApplication {
             sContext = this;
             BlockCanary.install(this, new BDBlockCanaryContext()).start();
         }
-        if (Constants.IS_OPEN_LEAK_CANARY) {
+        if (Constants.IS_OPEN_LEAK_CANARY && !Constants.BRUCE_TEST.equals(BuildConfig.FLAVOR)) {
             refWatcher = initLeakCanary();
         }
     }

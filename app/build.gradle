@@ -24,22 +24,36 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.antfortune.freeline'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
-
     defaultConfig {
         applicationId "com.brucedaily"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    freeline {
+        hack true
+        productFlavor 'develop'
+    }
+    productFlavors {
+        bruceTest {
+            targetSdkVersion 21
+            // 用于 reboloctric 单元测试使用,当前targetSdkVersion只支持21,compileSdkVersion和buildToolsVersion 不限,java.lang.NoClassDefFoundError: javax/microedition/khronos/opengles/GL
+        }
+        develop {
+
         }
     }
 }
@@ -57,4 +71,10 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     releaseCompile 'com.github.moduth:blockcanary-no-op:1.3.0'
     debugCompile 'com.github.moduth:blockcanary-ui:1.2.0'
+    testCompile 'org.robolectric:robolectric:3.1.2'
+    testCompile 'org.robolectric:robolectric-shadows:3.1'
+    testCompile 'org.robolectric:shadows-support-v4:3.1.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }

@@ -25,11 +25,12 @@
 
 package com.brucedaily.month;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -50,7 +51,7 @@ import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.database.dao.CostMonthDao;
 import com.brucedaily.database.dao.DaoMaster;
 import com.brucedaily.database.dao.DaoSession;
-import com.bruceutils.base.BaseFragmentActivity;
+import com.bruceutils.base.BaseActivity;
 import com.bruceutils.utils.LogUtils;
 import com.bruceutils.utils.ProgressDialogUtils;
 import com.bruceutils.utils.logdetails.LogDetails;
@@ -103,6 +104,8 @@ public class MonthDailyActivity extends BaseFragmentActivity implements View.OnC
      */
     public static final String DB_RESTORE = "dbRestore";
     public static final String DB_NAME = "md_db";
+    // robolectric test
+    public String testTagInfo;
     TextView tvTitle;
     Button btnAdd;
     Button btnClear;
@@ -132,6 +135,7 @@ public class MonthDailyActivity extends BaseFragmentActivity implements View.OnC
     private int position; // 待修改数据位置
     private FragmentManager fragmentManager;
     private long exitFlag;
+    private DefaultItemAnimator defaultItemAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +153,9 @@ public class MonthDailyActivity extends BaseFragmentActivity implements View.OnC
 
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvContainer.setLayoutManager(manager);
+
+        defaultItemAnimator = new DefaultItemAnimator();
+        rvContainer.setItemAnimator(defaultItemAnimator);
 
 //        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 //        rvContainer.setLayoutManager(staggeredGridLayoutManager);
@@ -172,7 +179,10 @@ public class MonthDailyActivity extends BaseFragmentActivity implements View.OnC
 
         monthCount();
 
-        fragmentManager = getSupportFragmentManager();
+        fragmentManager = getFragmentManager();
+
+        // robolectric test
+        testTagInfo = AppUtils.robolectricTestInfo("onCreate");
     }
 
     private void initView() {

@@ -57,6 +57,8 @@ import java.util.List;
  * Created by BruceHurrican on 16/8/22.
  */
 public class MonthAddModifyFragment extends BDFragment implements View.OnClickListener, View.OnFocusChangeListener {
+    // robolectric test
+    public String testInfo;
     AutoCompleteTextView actwTitle;
     MultiAutoCompleteTextView mactwContent;
     AutoCompleteTextView actwTime;
@@ -100,7 +102,7 @@ public class MonthAddModifyFragment extends BDFragment implements View.OnClickLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle bundle = getArguments();
-        isAdd = bundle.getBoolean(MonthDailyActivity.KEY_IS_ADD);
+        isAdd = null == bundle || bundle.getBoolean(MonthDailyActivity.KEY_IS_ADD);
         if (!isAdd) {
             actwTitle.setHint(bundle.getString(MonthDailyActivity.KEY_COST_TITLE));
             mactwContent.setHint(bundle.getString(MonthDailyActivity.KEY_COST_DETAIL));
@@ -109,6 +111,8 @@ public class MonthAddModifyFragment extends BDFragment implements View.OnClickLi
         }
         initACTWdata(actwTitle, mactwContent, actwTime);
         mactwContent.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        // robolectric test
+        testInfo = AppUtils.robolectricTestInfo("onViewCreated");
     }
 
     public void onFocusChange(final View v, boolean hasFocus) {

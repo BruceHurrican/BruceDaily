@@ -39,4 +39,9 @@ public class Constants {
      * 是否打开UI卡顿监控
      */
     public static final boolean IS_OPEN_UI_BLOCK_CANARY = true;
+
+    /**
+     * build productFlavors
+     */
+    public static final String BRUCE_TEST = "bruceTest";
 }
