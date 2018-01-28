@@ -74,7 +74,7 @@ import java.util.concurrent.Executors;
  * 按月统计消费金额
  * Created by BruceHurrican on 2016/7/24.
  */
-public class MonthDailyActivity extends BaseFragmentActivity implements View.OnClickListener {
+public class MonthDailyActivity extends BaseActivity implements View.OnClickListener {
     /**
      * 是否是添加数据
      */
