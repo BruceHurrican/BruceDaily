@@ -52,35 +52,23 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.OnFocusChange;
-
 /**
  * 增加 修改界面
  * Created by BruceHurrican on 16/8/22.
  */
-public class NoteAddModifyFragment extends BDFragment {
+public class NoteAddModifyFragment extends BDFragment implements View.OnClickListener, View.OnFocusChangeListener {
     /**
      * 增加、修改数据
      */
     public static final int CODE_MSG_OPERATER_ITEM = 1001;
     // robolectric test
     public String testInfo;
-    @Bind(R.id.actw_title)
     AutoCompleteTextView actwTitle;
-    @Bind(R.id.mactw_content)
     MultiAutoCompleteTextView mactwContent;
-    @Bind(R.id.actw_time)
     AutoCompleteTextView actwTime;
-    @Bind(R.id.et_price)
     EditText etPrice;
-    @Bind(R.id.ll_content)
     LinearLayout llContent;
-    @Bind(R.id.btn_ok)
     Button btnOk;
-    @Bind(R.id.btn_cancel)
     Button btnCancel;
     private boolean isAdd;
 
@@ -88,7 +76,7 @@ public class NoteAddModifyFragment extends BDFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.month_item_add_modify, container, false);
-        ButterKnife.bind(this, view);
+//        ButterKnife.bind(this, view);
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -96,6 +84,21 @@ public class NoteAddModifyFragment extends BDFragment {
                 return true;
             }
         });
+
+        actwTitle = (AutoCompleteTextView) view.findViewById(R.id.actw_title);
+        mactwContent = (MultiAutoCompleteTextView) view.findViewById(R.id.mactw_content);
+        llContent = (LinearLayout) view.findViewById(R.id.ll_content);
+        actwTime = (AutoCompleteTextView) view.findViewById(R.id.actw_time);
+        etPrice = (EditText) view.findViewById(R.id.et_price);
+        btnOk = (Button) view.findViewById(R.id.btn_ok);
+        btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+
+        actwTitle.setOnFocusChangeListener(this);
+        actwTime.setOnFocusChangeListener(this);
+        mactwContent.setOnFocusChangeListener(this);
+
+        btnOk.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
         return view;
     }
 
@@ -116,7 +119,6 @@ public class NoteAddModifyFragment extends BDFragment {
         testInfo = AppUtils.robolectricTestInfo("onViewCreated");
     }
 
-    @OnFocusChange({R.id.actw_title, R.id.mactw_content, R.id.actw_time})
     public void onFocusChange(final View v, boolean hasFocus) {
         switch (v.getId()) {
             case R.id.actw_title:
@@ -146,14 +148,18 @@ public class NoteAddModifyFragment extends BDFragment {
         titleList.add("早餐");
         titleList.add("中餐");
         titleList.add("晚餐");
+        titleList.add("买水果");
+        titleList.add("买面包");
+        titleList.add("买食材");
+        titleList.add("买零食");
         titleList.add("超市购物");
         titleList.add("淘宝购物");
         titleList.add("房租");
         titleList.add("充公交卡");
         titleList.add("充手机话费");
         titleList.add("孝敬长辈");
-        titleList.add("房东小店");
-        titleList.add("地铁坐摩的到宿舍");
+        titleList.add("加班打车");
+        titleList.add("同事/朋友聚餐");
         ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, titleList);
         titleView.setAdapter(titleAdapter);
 
@@ -162,14 +168,12 @@ public class NoteAddModifyFragment extends BDFragment {
         contentList.add("现金");
         contentList.add("招行信用卡支出");
         contentList.add("广发信用卡支出");
+        contentList.add("宁波银行信用卡支出");
         contentList.add("余额宝支出");
         contentList.add("蚂蚁花呗支出");
         contentList.add("微信转账");
         contentList.add("平安卡支出");
         contentList.add("招行卡支出");
-        contentList.add("买水果");
-        contentList.add("买食材");
-        contentList.add("买零食");
         ArrayAdapter<String> contentAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, contentList);
         contentView.setAdapter(contentAdapter);
 
@@ -185,10 +189,9 @@ public class NoteAddModifyFragment extends BDFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.btn_ok, R.id.btn_cancel})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_ok:

@@ -60,15 +60,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
 /**
  * 按月统计消费金额
  * Created by BruceHurrican on 2016/10/27.
  */
-public class NoteActivity extends BaseActivity {
+public class NoteActivity extends BaseActivity implements View.OnClickListener {
     /**
      * 是否是添加数据
      */
@@ -120,37 +116,21 @@ public class NoteActivity extends BaseActivity {
     public static final int CODE_MONTH_COUNT_REMAIN = 104;
     // robolectric test
     public String testTagInfo;
-    @Bind(R.id.tv_title)
     TextView tvTitle;
-    @Bind(R.id.btn_add)
     Button btnAdd;
-    @Bind(R.id.btn_clear)
     Button btnClear;
-    @Bind(R.id.tv_total)
     TextView tvTotal;
-    @Bind(R.id.tv_remain)
     TextView tvRemain;
-    @Bind(R.id.tv_count_early)
     TextView tvCountEarly;
-    @Bind(R.id.tv_count_middle)
     TextView tvCountMiddle;
-    @Bind(R.id.tv_count_last)
     TextView tvCountLast;
-    @Bind(R.id.ll_container)
     LinearLayout llContainer;
-    @Bind(R.id.tv_rv_type)
     LinearLayout tvRvTitle;
-    @Bind(R.id.rv_container)
     RecyclerView rvContainer;
-    @Bind(R.id.btn_list)
     Button btnList;
-    @Bind(R.id.btn_grid)
     Button btnGrid;
-    @Bind(R.id.rl_root)
     RelativeLayout rlRoot;
-    @Bind(R.id.btn_db_back)
     Button btnDbBack;
-    @Bind(R.id.btn_db_restore)
     Button btnDbRestore;
     private List<CostMonth> dataList = new ArrayList<>(31);
     private CostAdapter costAdapter;
@@ -164,7 +144,9 @@ public class NoteActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.month_activity_daily);
-        ButterKnife.bind(this);
+
+        initView();
+
         tvTitle.setText("月统计2");
         EventBus.getDefault().register(this);
         initUIHandler();
@@ -210,6 +192,31 @@ public class NoteActivity extends BaseActivity {
 
         // robolectric test
         testTagInfo = AppUtils.robolectricTestInfo("onCreate");
+    }
+
+    private void initView() {
+        rlRoot = (RelativeLayout) findViewById(R.id.rl_root);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
+        btnAdd = (Button) findViewById(R.id.btn_add);
+        btnClear = (Button) findViewById(R.id.btn_clear);
+        llContainer = (LinearLayout) findViewById(R.id.ll_container);
+        tvTotal = (TextView) findViewById(R.id.tv_total);
+        tvRemain = (TextView) findViewById(R.id.tv_remain);
+        tvCountEarly = (TextView) findViewById(R.id.tv_count_early);
+        tvCountMiddle = (TextView) findViewById(R.id.tv_count_middle);
+        tvCountLast = (TextView) findViewById(R.id.tv_count_last);
+        btnList = (Button) findViewById(R.id.btn_list);
+        btnGrid = (Button) findViewById(R.id.btn_grid);
+        btnDbBack = (Button) findViewById(R.id.btn_db_back);
+        btnDbRestore = (Button) findViewById(R.id.btn_db_restore);
+        rvContainer = (RecyclerView) findViewById(R.id.rv_container);
+
+        btnAdd.setOnClickListener(this);
+        btnClear.setOnClickListener(this);
+        btnList.setOnClickListener(this);
+        btnGrid.setOnClickListener(this);
+        btnDbBack.setOnClickListener(this);
+        btnDbRestore.setOnClickListener(this);
     }
 
     /**
@@ -361,7 +368,6 @@ public class NoteActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_add, R.id.btn_clear, R.id.btn_list, R.id.btn_grid, R.id.btn_db_back, R.id.btn_db_restore})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
@@ -422,7 +428,7 @@ public class NoteActivity extends BaseActivity {
         if (null != presenter) {
             presenter.clearReference();
         }
-        ButterKnife.unbind(this);
+//        ButterKnife.unbind(this);
         EventBus.getDefault().unregister(this);
         recycleUIHandler();
         // robolectric test

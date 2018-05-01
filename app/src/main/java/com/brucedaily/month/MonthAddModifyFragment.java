@@ -144,15 +144,18 @@ public class MonthAddModifyFragment extends BDFragment implements View.OnClickLi
         titleList.add("早餐");
         titleList.add("中餐");
         titleList.add("晚餐");
+        titleList.add("买水果");
+        titleList.add("买面包");
+        titleList.add("买食材");
+        titleList.add("买零食");
         titleList.add("超市购物");
         titleList.add("淘宝购物");
         titleList.add("房租");
         titleList.add("充公交卡");
         titleList.add("充手机话费");
         titleList.add("孝敬长辈");
-        titleList.add("房东小店");
         titleList.add("加班打车");
-        titleList.add("地铁坐摩的到宿舍");
+        titleList.add("同事/朋友聚餐");
         ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(getActivity(), R.layout.month_data_item, titleList);
         titleView.setAdapter(titleAdapter);
 
@@ -161,6 +164,7 @@ public class MonthAddModifyFragment extends BDFragment implements View.OnClickLi
         contentList.add("现金");
         contentList.add("招行信用卡支出");
         contentList.add("广发信用卡支出");
+        contentList.add("宁波银行信用卡支出");
         contentList.add("余额宝支出");
         contentList.add("蚂蚁花呗支出");
         contentList.add("微信转账");
