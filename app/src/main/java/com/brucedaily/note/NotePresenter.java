@@ -30,6 +30,7 @@ import android.text.TextUtils;
 
 import com.brucedaily.AppUtils;
 import com.brucedaily.R;
+import com.brucedaily.SharedPreferencesUtil;
 import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.database.dao.CostMonthDao;
 import com.brucedaily.database.dao.DaoMaster;
@@ -94,7 +95,7 @@ public class NotePresenter {
      * 月消费统计
      */
     public void monthCount() {
-        float total = 4500;
+        float total = SharedPreferencesUtil.getInt(mActivity, NoteActivity.LOCAL_DATA_KEY_TOTAL_BUDGET, NoteActivity.TOTAL_BUDGET);
         List<CostMonth> tmpList;
         // 上旬花费
         float monthEarly = 0;

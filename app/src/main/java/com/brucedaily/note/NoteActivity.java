@@ -25,6 +25,7 @@
 
 package com.brucedaily.note;
 
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.BitmapDrawable;
@@ -33,11 +34,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -45,6 +48,7 @@ import android.widget.TextView;
 
 import com.brucedaily.AppUtils;
 import com.brucedaily.R;
+import com.brucedaily.SharedPreferencesUtil;
 import com.brucedaily.database.bean.CostMonth;
 import com.brucedaily.month.CostAdapter;
 import com.bruceutils.base.BaseActivity;
@@ -65,55 +69,55 @@ import java.util.List;
  * Created by BruceHurrican on 2016/10/27.
  */
 public class NoteActivity extends BaseActivity implements View.OnClickListener {
+
+    /**
+     * 总预算
+     */
+    public static final int TOTAL_BUDGET = 6000;
+
     /**
      * 是否是添加数据
      */
     public static final String KEY_IS_ADD = "isAdd";
-    /**
-     * 消费标题
-     */
+
+    /** 消费标题 */
     public static final String KEY_COST_TITLE = "costTitle";
-    /**
-     * 消费详情
-     */
+
+    /** 消费详情 */
     public static final String KEY_COST_DETAIL = "costDetail";
-    /**
-     * 消费日期
-     */
+
+    /** 消费日期 */
     public static final String KEY_COST_DAY = "costDay";
-    /**
-     * 消费价格
-     */
+
+    /** 消费价格 */
     public static final String KEY_COST_PRICE = "costPrice";
-    /**
-     * 备份数据库
-     */
+
+    /** 备份数据库 */
     public static final String DB_BACKUP = "dbBackup";
-    /**
-     * 恢复数据库
-     */
+
+    /** 恢复数据库 */
     public static final String DB_RESTORE = "dbRestore";
     public static final String DB_NAME = "md_db";
-    /**
-     * 恢复数据库成功
-     */
+
+    /** 恢复数据库成功 */
     public static final int CODE_RESTORE_DB_SUCCESS = 100;
-    /**
-     * 当月上旬花费统计
-     */
+
+    /** 当月上旬花费统计 */
     public static final int CODE_MONTH_COUNT_1 = 101;
-    /**
-     * 当月上旬中旬花费统计
-     */
+
+    /** 当月上旬中旬花费统计 */
     public static final int CODE_MONTH_COUNT_2 = 102;
-    /**
-     * 当月下旬花费统计
-     */
+
+    /** 当月下旬花费统计 */
     public static final int CODE_MONTH_COUNT_3 = 103;
-    /**
-     * 当月花费预算余额
-     */
+
+    /** 当月花费预算余额 */
     public static final int CODE_MONTH_COUNT_REMAIN = 104;
+
+    /**
+     * 本地 sharepreference key
+     */
+    public static final String LOCAL_DATA_KEY_TOTAL_BUDGET = "preTotalKey";
     // robolectric test
     public String testTagInfo;
     TextView tvTitle;
@@ -147,7 +151,7 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
 
         initView();
 
-        tvTitle.setText("月统计2");
+        tvTitle.setText("月统计");
         EventBus.getDefault().register(this);
         initUIHandler();
         ProgressDialogUtils.initProgressBar(NoteActivity.this, "操作进行中...", R.mipmap.ic_app);
@@ -171,19 +175,13 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
 
         rvContainer.setAdapter(costAdapter);
 
-        costAdapter.setItemClickListener(new CostAdapter.CardViewItemClickListener() {
-            @Override
-            public void itemClick(View view, int position) {
-                LogDetails.i("当前选中的数据: " + dataList.get(position).costTitle);
-                showDetails(position);
-            }
+        costAdapter.setItemClickListener((view, position) -> {
+            LogDetails.i("当前选中的数据: " + dataList.get(position).costTitle);
+            showDetails(position);
         });
-        costAdapter.setItemLongClickListener(new CostAdapter.CardViewItemLongClickListener() {
-            @Override
-            public void itemLongClick(View view, int position) {
-                LogDetails.i("当前选中的数据: " + dataList.get(position).costPrice);
-                showOperator(position);
-            }
+        costAdapter.setItemLongClickListener((view, position) -> {
+            LogDetails.i("当前选中的数据: " + dataList.get(position).costPrice);
+            showOperator(position);
         });
 
         presenter.monthCount();
@@ -201,6 +199,11 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
         btnClear = (Button) findViewById(R.id.btn_clear);
         llContainer = (LinearLayout) findViewById(R.id.ll_container);
         tvTotal = (TextView) findViewById(R.id.tv_total);
+        tvTotal.setText(String.format(getString(R.string.total_budget), SharedPreferencesUtil.getInt(this, LOCAL_DATA_KEY_TOTAL_BUDGET, TOTAL_BUDGET)));
+        tvTotal.setOnLongClickListener(v -> {
+            showModifyTotalBudgetDialog();
+            return false;
+        });
         tvRemain = (TextView) findViewById(R.id.tv_remain);
         tvCountEarly = (TextView) findViewById(R.id.tv_count_early);
         tvCountMiddle = (TextView) findViewById(R.id.tv_count_middle);
@@ -217,6 +220,27 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
         btnGrid.setOnClickListener(this);
         btnDbBack.setOnClickListener(this);
         btnDbRestore.setOnClickListener(this);
+    }
+
+    private void showModifyTotalBudgetDialog() {
+        final Dialog dialog = new Dialog(NoteActivity.this);
+        dialog.setContentView(R.layout.total_budget_dialog);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setTitle("修改总预算");
+        Button btnCancel = (Button) dialog.findViewById(R.id.btn_cancel);
+        Button btnSure = (Button) dialog.findViewById(R.id.btn_sure);
+        final EditText editText = (EditText) dialog.findViewById(R.id.et_total_budget);
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnSure.setOnClickListener(v -> {
+            if (!TextUtils.isEmpty(editText.getText().toString().trim())) {
+                SharedPreferencesUtil.saveInt(NoteActivity.this, LOCAL_DATA_KEY_TOTAL_BUDGET, Integer.valueOf(editText.getText().toString().trim()));
+                tvTotal.setText(String.format(getString(R.string.total_budget), Integer.valueOf(editText.getText().toString().trim())));
+                refreshData();
+            }
+            dialog.dismiss();
+        });
+        dialog.show();
     }
 
     /**
@@ -256,25 +280,19 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
         popupWindow.showAtLocation(rlRoot, Gravity.CENTER, 0, 0);
-        tvModify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                operateCostRecord(position, false);
-            }
+        tvModify.setOnClickListener(v -> {
+            popupWindow.dismiss();
+            operateCostRecord(position, false);
         });
-        tvDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 先删除数据库中数据再删除内存中数据
+        tvDelete.setOnClickListener(v -> {
+            // 先删除数据库中数据再删除内存中数据
 //                deleteItem(dataList.get(position));
-                presenter.deleteItem(dataList.get(position));
-                dataList.remove(position);
-                refreshData();
-                popupWindow.dismiss();
-                LogDetails.i("删除一条数据");
-                showToastShort("删除一条数据");
-            }
+            presenter.deleteItem(dataList.get(position));
+            dataList.remove(position);
+            refreshData();
+            popupWindow.dismiss();
+            LogDetails.i("删除一条数据");
+            showToastShort("删除一条数据");
         });
     }
 
@@ -327,12 +345,9 @@ public class NoteActivity extends BaseActivity implements View.OnClickListener {
         switch (noteMsg.code) {
             case CODE_RESTORE_DB_SUCCESS:
                 dataList = presenter.initData(costAdapter);
-                getUIHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshData();
-                        showToastShort(noteMsg.msg);
-                    }
+                getUIHandler().post(() -> {
+                    refreshData();
+                    showToastShort(noteMsg.msg);
                 });
                 break;
             case CODE_MONTH_COUNT_1:
